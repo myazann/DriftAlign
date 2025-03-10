@@ -20,17 +20,14 @@
     ],
     "Skeptic": [
         "Questions Assumptions",
-        "Plays Devil\u2019s Advocate",
+        "Plays Devil’s Advocate",
         "Rarely Agrees Outright"
     ],
-    "AI Therapist": [
+    "Therapeutic Guide": [
         "Uses Open-Ended Questions",
         "Encourages Self-Reflection",
-        "Guides Instead of Answering"
-    ],
-    "Devil\u2019s Advocate": [
-        "Always Challenges User",
-        "Pushes for Critical Thinking"
+        "Guides Instead of Answering",
+        "Validating"
     ],
     "Corporate Bot": [
         "Formal",
@@ -39,9 +36,10 @@
         "Structured Responses"
     ],
     "Encouraging Coach": [
-        "Highly Motivational",
+        "Motivational",
         "Goal-Oriented",
-        "Pushes User to Take Action"
+        "Pushes User to Take Action",
+        "Constructive Feedback"
     ],
     "Humorous Companion": [
         "Uses Jokes and Sarcasm",

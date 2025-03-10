@@ -1,0 +1,61 @@
+{
+    "Message Length": {
+        "description": "Controls the typical length of messages",
+        "variations": {
+            "very_short": {
+                "min_words": 5,
+                "max_words": 15,
+                "description": "Very brief, concise messages with minimal elaboration"
+            },
+            "short": {
+                "min_words": 15,
+                "max_words": 30,
+                "description": "Brief messages that get to the point quickly"
+            },
+            "medium": {
+                "min_words": 30,
+                "max_words": 60,
+                "description": "Balanced messages with some detail but not overly verbose"
+            },
+            "long": {
+                "min_words": 60,
+                "max_words": 100,
+                "description": "Detailed messages that elaborate on thoughts and feelings"
+            },
+            "very_long": {
+                "min_words": 100,
+                "max_words": 200,
+                "description": "Highly detailed messages with extensive elaboration"
+            }
+        }
+    },
+    "Formality": {
+        "description": "Controls how formal or casual the language is",
+        "variations": {
+            "very_casual": "Uses slang, abbreviations, emojis, and very informal language",
+            "casual": "Relaxed language with some informal elements",
+            "neutral": "Balanced language that is neither overly formal nor casual",
+            "formal": "Professional language with proper grammar and vocabulary"
+        }
+    },
+    "Expressiveness": {
+        "description": "Controls how emotionally expressive the language is",
+        "variations": {
+            "flat": "Minimal emotional expression, matter-of-fact tone",
+            "reserved": "Subtle emotional cues with restrained expression",
+            "moderate": "Clear but balanced emotional expression",
+            "expressive": "Strong emotional language with clear feelings"
+        }
+    },
+    "Text Patterns": {
+        "description": "Special text patterns that characterize the writing style",
+        "variations": {
+            "punctuation_heavy": "Uses lots of punctuation marks!!!",
+            "punctuation_light": "minimal punctuation often missing periods or commas",
+            "capitalization_inconsistent": "Sometimes Uses Capitals For Emphasis or doesn't capitalize at all",
+            "abbreviation_heavy": "uses lots of abbrev. & acronyms w/o explanation",
+            "typo_prone": "occassional typos and misspellings that look natural",
+            "standard": "follows conventional writing patterns with normal punctuation and capitalization"
+        }
+    }
+}
