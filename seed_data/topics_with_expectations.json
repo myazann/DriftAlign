@@ -1,0 +1,261 @@
+{
+  "Technology": {
+    "Device troubleshooting": {
+      "topic": "Device malfunctions and troubleshooting (e.g., smartphones, laptops)",
+      "expectations": [
+        {
+          "intent": "Fix a specific technical problem",
+          "expectation": "Get clear, step-by-step instructions to solve the issue"
+        },
+        {
+          "intent": "Understand why the device is malfunctioning",
+          "expectation": "Get a simple explanation of the likely cause without technical jargon"
+        }
+      ]
+    },
+    "Software issues": {
+      "topic": "Software bugs and error messages",
+      "expectations": [
+        {
+          "intent": "Fix a software bug or error",
+          "expectation": "Get precise instructions to resolve the issue quickly"
+        },
+        {
+          "intent": "Understand what caused the error",
+          "expectation": "Get an explanation that helps prevent the issue in the future"
+        }
+      ]
+    },
+    "Connectivity": {
+      "topic": "Connectivity issues (e.g., Wi-Fi, network outages)",
+      "expectations": [
+        {
+          "intent": "Restore lost connectivity",
+          "expectation": "Get troubleshooting steps that quickly restore connection"
+        },
+        {
+          "intent": "Diagnose ongoing connectivity problems",
+          "expectation": "Identify the root cause of recurring issues"
+        }
+      ]
+    },
+    "Tech comparisons": {
+      "topic": "Comparing different technology products or services",
+      "expectations": [
+        {
+          "intent": "Choose between technology options",
+          "expectation": "Get a straightforward comparison with pros and cons"
+        },
+        {
+          "intent": "Understand value for money",
+          "expectation": "Get clear information about which option provides best value for specific needs"
+        }
+      ]
+    }
+  },
+  "Health & Wellness": {
+    "Physical health": {
+      "topic": "Minor physical symptoms (e.g., headaches, fatigue)",
+      "expectations": [
+        {
+          "intent": "Get advice for a specific symptom",
+          "expectation": "Receive practical, actionable advice that acknowledges concerns"
+        },
+        {
+          "intent": "Determine if medical attention is needed",
+          "expectation": "Get clear guidance on when to see a doctor"
+        }
+      ]
+    },
+    "Mental health": {
+      "topic": "Mental health concerns (e.g., stress, anxiety)",
+      "expectations": [
+        {
+          "intent": "Improve mental well-being",
+          "expectation": "Get personalized strategies that fit their lifestyle"
+        },
+        {
+          "intent": "Manage anxiety in specific situations",
+          "expectation": "Get immediate coping techniques they can use anywhere"
+        }
+      ]
+    },
+    "Lifestyle": {
+      "topic": "Lifestyle guidance (e.g., nutrition, exercise, sleep patterns)",
+      "expectations": [
+        {
+          "intent": "Establish better habits",
+          "expectation": "Get specific, achievable changes they can implement"
+        },
+        {
+          "intent": "Optimize current routine",
+          "expectation": "Get targeted improvements to existing habits"
+        }
+      ]
+    }
+  },
+  "Finance & Investment": {
+    "Stock market": {
+      "topic": "Stock market trends and analysis",
+      "expectations": [
+        {
+          "intent": "Understand market movements",
+          "expectation": "Get clear explanations of complex financial trends"
+        },
+        {
+          "intent": "Identify investment opportunities",
+          "expectation": "Get specific suggestions with supporting rationale"
+        }
+      ]
+    },
+    "Personal finance": {
+      "topic": "Personal budgeting and financial planning",
+      "expectations": [
+        {
+          "intent": "Create a budget plan",
+          "expectation": "Get a customized approach that accounts for their financial situation"
+        },
+        {
+          "intent": "Reduce expenses",
+          "expectation": "Get practical cost-cutting ideas that maintain quality of life"
+        }
+      ]
+    },
+    "Investment strategy": {
+      "topic": "Investment strategies and risk management",
+      "expectations": [
+        {
+          "intent": "Balance investment portfolio",
+          "expectation": "Get specific allocation advice based on goals and risk tolerance"
+        },
+        {
+          "intent": "Understand investment risks",
+          "expectation": "Get clear explanations of potential downsides"
+        }
+      ]
+    }
+  },
+  "Career Advice": {
+    "Job decisions": {
+      "topic": "Choosing between two job offers",
+      "expectations": [
+        {
+          "intent": "Compare job opportunities",
+          "expectation": "Get a thorough comparison that includes intangibles like culture"
+        },
+        {
+          "intent": "Negotiate job offer",
+          "expectation": "Get specific strategies for improving their offer"
+        }
+      ]
+    },
+    "Workplace issues": {
+      "topic": "Dealing with workplace conflict",
+      "expectations": [
+        {
+          "intent": "Resolve colleague disagreement",
+          "expectation": "Get diplomatic approaches that maintain professional relationships"
+        },
+        {
+          "intent": "Address unfair treatment",
+          "expectation": "Get appropriate responses that protect their interests"
+        }
+      ]
+    },
+    "Job satisfaction": {
+      "topic": "Struggling with job satisfaction",
+      "expectations": [
+        {
+          "intent": "Improve current job experience",
+          "expectation": "Get strategies to enhance satisfaction without changing jobs"
+        },
+        {
+          "intent": "Decide whether to leave position",
+          "expectation": "Get balanced guidance on when to stay vs. when to go"
+        }
+      ]
+    }
+  },
+  "Relationships": {
+    "Romantic relationships": {
+      "topic": "Doubts about a romantic relationship",
+      "expectations": [
+        {
+          "intent": "Evaluate relationship health",
+          "expectation": "Get objective assessment of concerning behaviors"
+        },
+        {
+          "intent": "Improve communication with partner",
+          "expectation": "Get specific phrases and approaches to address issues"
+        }
+      ]
+    },
+    "Friendships": {
+      "topic": "Navigating a friendship conflict",
+      "expectations": [
+        {
+          "intent": "Repair damaged friendship",
+          "expectation": "Get reconciliation strategies that respect both perspectives"
+        },
+        {
+          "intent": "Set boundaries with friends",
+          "expectation": "Get tactful approaches to establish healthy boundaries"
+        }
+      ]
+    },
+    "Dating": {
+      "topic": "Asking for dating advice",
+      "expectations": [
+        {
+          "intent": "Improve dating prospects",
+          "expectation": "Get actionable suggestions that build on their strengths"
+        },
+        {
+          "intent": "Understand dating signals",
+          "expectation": "Get clear interpretation of ambiguous interactions"
+        }
+      ]
+    }
+  },
+  "Customer Service": {
+    "Product issues": {
+      "topic": "Product issues and defect troubleshooting",
+      "expectations": [
+        {
+          "intent": "Resolve a specific product issue",
+          "expectation": "Get immediate resolution or clear next steps"
+        },
+        {
+          "intent": "Get compensation for defective product",
+          "expectation": "Receive fair reimbursement or replacement"
+        }
+      ]
+    },
+    "Service failures": {
+      "topic": "Service failures and support resolution",
+      "expectations": [
+        {
+          "intent": "Fix interrupted service",
+          "expectation": "Get quick restoration of service with minimal hassle"
+        },
+        {
+          "intent": "Get refund for poor service",
+          "expectation": "Receive prompt, fair compensation for service failures"
+        }
+      ]
+    },
+    "Feedback": {
+      "topic": "Feedback collection and complaint management",
+      "expectations": [
+        {
+          "intent": "Submit feedback about experience",
+          "expectation": "Have feedback acknowledged and acted upon"
+        },
+        {
+          "intent": "Escalate unresolved complaint",
+          "expectation": "Reach someone with authority to solve their problem"
+        }
+      ]
+    }
+  }
+}

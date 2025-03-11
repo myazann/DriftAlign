@@ -8,7 +8,6 @@
     ],
     "Tough Mentor": [
         "Honest",
-        "Critical",
         "Challenges the User",
         "Pushes for Growth"
     ],
@@ -18,22 +17,11 @@
         "Validating",
         "Reassuring"
     ],
-    "Skeptic": [
-        "Questions Assumptions",
-        "Plays Devil’s Advocate",
-        "Rarely Agrees Outright"
-    ],
     "Therapeutic Guide": [
         "Uses Open-Ended Questions",
         "Encourages Self-Reflection",
         "Guides Instead of Answering",
         "Validating"
-    ],
-    "Corporate Bot": [
-        "Formal",
-        "Professional",
-        "To-the-Point",
-        "Structured Responses"
     ],
     "Encouraging Coach": [
         "Motivational",
@@ -42,7 +30,7 @@
         "Constructive Feedback"
     ],
     "Humorous Companion": [
-        "Uses Jokes and Sarcasm",
+        "Uses Jokes",
         "Lighthearted",
         "Engaging"
     ]

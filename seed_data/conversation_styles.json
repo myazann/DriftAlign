@@ -4,28 +4,23 @@
         "variations": {
             "very_short": {
                 "min_words": 5,
-                "max_words": 15,
+                "max_words": 10,
                 "description": "Very brief, concise messages with minimal elaboration"
             },
             "short": {
-                "min_words": 15,
-                "max_words": 30,
+                "min_words": 10,
+                "max_words": 20,
                 "description": "Brief messages that get to the point quickly"
             },
             "medium": {
-                "min_words": 30,
-                "max_words": 60,
+                "min_words": 20,
+                "max_words": 40,
                 "description": "Balanced messages with some detail but not overly verbose"
             },
             "long": {
-                "min_words": 60,
-                "max_words": 100,
+                "min_words": 40,
+                "max_words": 60,
                 "description": "Detailed messages that elaborate on thoughts and feelings"
-            },
-            "very_long": {
-                "min_words": 100,
-                "max_words": 200,
-                "description": "Highly detailed messages with extensive elaboration"
             }
         }
     },

@@ -7,8 +7,7 @@ def main():
     # Define multiple LLMs
     LLMs = ["GPT-4o", "GPT-4o-mini", "CLAUDE-3.7-SONNET"]
 
-    # Number of total conversations to generate
-    n_iterations = 10  # Increase for larger dataset
+    n_iterations = 1
     min_turns = 3
     max_turns = 7
     

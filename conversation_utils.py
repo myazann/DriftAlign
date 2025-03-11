@@ -3,6 +3,11 @@ import json
 import os
 import time
 from pathlib import Path
+from datetime import datetime
+import re
+
+from prompts import construct_satisfaction_evaluation_prompt
+from models import LLM
 
 def select_conversation_style(conversation_styles):
     """
@@ -39,15 +44,13 @@ def select_conversation_style(conversation_styles):
                     weights = []
                     for variant in options:
                         if variant == "very_short":
-                            weights.append(0.4)  # 40% chance
+                            weights.append(0.5)  # 50% chance
                         elif variant == "short":
-                            weights.append(0.3)  # 30% chance
+                            weights.append(0.35)  # 35% chance
                         elif variant == "medium":
-                            weights.append(0.15)  # 15% chance
+                            weights.append(0.1)  # 15% chance
                         elif variant == "long":
-                            weights.append(0.1)  # 10% chance
-                        elif variant == "very_long":
-                            weights.append(0.05)  # 5% chance
+                            weights.append(0.05)  # 10% chance
                         else:
                             weights.append(1.0)  # Default weight
                     
@@ -78,48 +81,6 @@ def select_conversation_style(conversation_styles):
     
     return style_profile
 
-def get_target_message_length(style_profile, conversation_styles):
-    """
-    Calculate a target message length based on the selected message length variation.
-    
-    Args:
-        style_profile: Dictionary of selected variations for each dimension
-        conversation_styles: Dictionary of all conversation style dimensions and variations
-        
-    Returns:
-        Integer target word count
-    """
-    # Get the selected message length variation
-    message_length = style_profile.get('Message Length', 'medium')
-    
-    # If message length info is in the conversation styles data, use that
-    if 'Message Length' in conversation_styles:
-        message_length_data = conversation_styles['Message Length']
-        
-        # Check if using nested structure with variations
-        if isinstance(message_length_data, dict) and "variations" in message_length_data:
-            variations = message_length_data["variations"]
-            
-            # If the selected length exists in variations and has min/max words
-            if message_length in variations and isinstance(variations[message_length], dict):
-                length_data = variations[message_length]
-                if "min_words" in length_data and "max_words" in length_data:
-                    min_words = length_data["min_words"]
-                    max_words = length_data["max_words"]
-                    return random.randint(min_words, max_words)
-    
-    # Otherwise use default ranges
-    default_ranges = {
-        'very_short': (5, 15),
-        'short': (15, 30),
-        'medium': (30, 60),
-        'long': (60, 100),
-        'very_long': (100, 150)
-    }
-    
-    min_words, max_words = default_ranges.get(message_length, (30, 60))
-    return random.randint(min_words, max_words)
-
 # Topic and expectation functions
 def select_topic_with_expectation(topics_with_expectations):
     """
@@ -146,130 +107,97 @@ def select_topic_with_expectation(topics_with_expectations):
     
     return category, topic_text, selected_expectation
 
+def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_index, llm_model="GPT-4o"):
+    """
+    Evaluate user satisfaction using an LLM to analyze how well the chatbot response
+    meets the user's expectations.
+    
+    Args:
+        conversation_history: List of tuples of (speaker, message)
+        user_expectation: Dictionary containing intent and expectation
+        turn_index: The current turn index in the conversation
+        llm_model: The LLM model to use for evaluation
+        
+    Returns:
+        Tuple of (satisfaction_score, explanation)
+    """
+    if len(conversation_history) < 2:
+        return 1.0, "Initial satisfaction is perfect"
+    
+    # Get the most recent user message and chatbot response
+    last_user_index = -2  # Second-to-last message (user)
+    last_chatbot_index = -1  # Last message (chatbot)
+    
+    if conversation_history[last_user_index][0] != "User" or conversation_history[last_chatbot_index][0] != "Chatbot":
+        # Something is wrong with the conversation history format
+        return 0.7, "Unable to properly evaluate conversation"
+    
+    user_message = conversation_history[last_user_index][1]
+    chatbot_response = conversation_history[last_chatbot_index][1]
+    
+    # Create evaluation prompt
+    evaluation_prompt = construct_satisfaction_evaluation_prompt(
+        user_message=user_message,
+        chatbot_response=chatbot_response,
+        user_expectation=user_expectation,
+        turn_index=turn_index
+    )
+    
+    # Use LLM to evaluate
+    llm = LLM(llm_model)
+    evaluation_result = llm.generate(evaluation_prompt)
+    
+    try:
+        # Clean up the response to ensure it's valid JSON
+        # First, find the start and end of JSON content
+        json_start = evaluation_result.find('{')
+        json_end = evaluation_result.rfind('}') + 1
+        
+        if json_start >= 0 and json_end > json_start:
+            # Extract just the JSON part
+            json_content = evaluation_result[json_start:json_end]
+            
+            # Parse the JSON result
+            result = json.loads(json_content)
+            satisfaction_score = float(result.get("satisfaction_score", 0.7))
+            explanation = result.get("explanation", "No explanation provided")
+            
+            # Ensure satisfaction is within bounds
+            satisfaction_score = max(0.05, min(0.95, satisfaction_score))
+            
+            # Store the explanation in the conversation history
+            conversation_history[-1] = (conversation_history[-1][0], conversation_history[-1][1], explanation)
+            
+            return satisfaction_score, explanation
+        else:
+            raise ValueError("Could not find valid JSON content in the response")
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        print(f"Error parsing LLM evaluation: {e}")
+        print(f"Raw response: {evaluation_result}")
+        
+        # Fallback to a default satisfaction score
+        return 0.7, "Error in satisfaction evaluation, using default score"
+
 def calculate_user_satisfaction(conversation_history, user_expectation, turn_index):
     """
-    Calculate user satisfaction based on conversation history and user expectations.
+    Calculate user satisfaction level based on how well the chatbot is meeting expectations.
     
     Args:
-        conversation_history: List of conversation turns
-        user_expectation: Dictionary containing intent, expectation, and frustration_trigger
-        turn_index: Current turn index (0-based)
+        conversation_history: List of tuples of (speaker, message)
+        user_expectation: Dictionary containing intent and expectation
+        turn_index: Current turn index
         
     Returns:
-        Float between 0.0 and 1.0 representing user satisfaction
+        Tuple of (satisfaction_score, explanation)
     """
-    # Start with moderate satisfaction (not perfect)
-    satisfaction = 0.7
+    # Use LLM-based satisfaction evaluation
+    satisfaction, explanation = evaluate_satisfaction_with_llm(
+        conversation_history, 
+        user_expectation, 
+        turn_index
+    )
     
-    # No expectations or not enough history to calculate satisfaction
-    if not user_expectation or turn_index < 1:
-        return satisfaction
-    
-    # Get the frustration trigger and expectation
-    frustration_trigger = user_expectation.get('frustration_trigger', '')
-    expectation = user_expectation.get('expectation', '')
-    intent = user_expectation.get('intent', '')
-    
-    # Extract the last chatbot message
-    last_chatbot_message = ''
-    if turn_index > 0 and len(conversation_history) >= 2:
-        _, last_chatbot_message = conversation_history[-1]
-    
-    # More realistic satisfaction calculation based on keywords and conversation quality
-    # Check for frustration triggers - use partial matching for more realistic detection
-    frustration_keywords = frustration_trigger.lower().split()
-    trigger_matches = sum(1 for keyword in frustration_keywords if keyword in last_chatbot_message.lower())
-    
-    # If we detect any frustration keywords, reduce satisfaction
-    if trigger_matches > 0:
-        # Stronger reduction based on how many triggers were found
-        satisfaction -= 0.1 * trigger_matches
-        
-        # Additional reduction if multiple triggers are found (indicating a problematic response)
-        if trigger_matches > 2:
-            satisfaction -= 0.2
-    
-    # Check if expectations are being met - use partial matching
-    expectation_keywords = expectation.lower().split()
-    expectation_matches = sum(1 for keyword in expectation_keywords if keyword in last_chatbot_message.lower())
-    
-    # If less than half of expectation keywords are found, reduce satisfaction
-    if expectation_keywords and expectation_matches < len(expectation_keywords) / 2:
-        satisfaction -= 0.3
-    
-    # Each turn without resolution reduces satisfaction more aggressively
-    if turn_index > 1:
-        # The longer the conversation goes, the more impatient the user becomes
-        satisfaction -= 0.1 * (turn_index - 1)
-    
-    # Randomly introduce some variability to make satisfaction less predictable
-    # Sometimes users get frustrated for no clear reason or remain satisfied despite issues
-    satisfaction += random.uniform(-0.2, 0.1)
-    
-    # If turn_index is high (conversation is dragging on), apply stronger penalties
-    if turn_index > 4:
-        satisfaction -= 0.2  # Users get impatient in long conversations
-    
-    # If the message is too short or too long, reduce satisfaction
-    if len(last_chatbot_message.split()) < 15:
-        satisfaction -= 0.15  # Too short responses feel dismissive
-    elif len(last_chatbot_message.split()) > 150:
-        satisfaction -= 0.1   # Too long responses can feel overwhelming
-    
-    # Ensure satisfaction stays between 0.0 and 1.0
-    satisfaction = max(0.0, min(1.0, satisfaction))
-    
-    return satisfaction
-
-def get_sentiment_based_on_satisfaction(satisfaction, initial_sentiment, user_sentiments):
-    """
-    Select an appropriate sentiment based on user satisfaction.
-    
-    Args:
-        satisfaction: Float between 0.0 and 1.0
-        initial_sentiment: The initial sentiment selected for the user
-        user_sentiments: List of available user sentiments
-        
-    Returns:
-        Selected sentiment string
-    """
-    # Define sentiment categories based on satisfaction level
-    high_satisfaction = ['Happy', 'Excited', 'Grateful', 'Relieved', 'Hopeful']
-    medium_satisfaction = ['Curious', 'Confused', 'Concerned', 'Surprised', 'No sentiment']
-    low_satisfaction = ['Frustrated', 'Angry', 'Disappointed', 'Anxious', 'Impatient', 'Skeptical', 'Overwhelmed']
-    
-    # Filter available sentiments by category
-    available_high = [s for s in user_sentiments if s in high_satisfaction]
-    available_medium = [s for s in user_sentiments if s in medium_satisfaction]
-    available_low = [s for s in user_sentiments if s in low_satisfaction]
-    
-    # Ensure each category has at least one sentiment
-    if not available_high:
-        available_high = ['Happy']
-    if not available_medium:
-        available_medium = ['No sentiment']
-    if not available_low:
-        available_low = ['Frustrated']
-    
-    # Adjust thresholds to favor more negative sentiments
-    # High satisfaction threshold is now higher
-    if satisfaction >= 0.8:
-        # High satisfaction, stay with initial sentiment if it's positive
-        if initial_sentiment in high_satisfaction:
-            return initial_sentiment
-        return random.choice(available_high)
-    # Medium satisfaction threshold is now broader
-    elif satisfaction >= 0.5:
-        # Medium satisfaction, mix of original and new
-        if random.random() < 0.3 and initial_sentiment not in low_satisfaction:
-            return initial_sentiment
-        return random.choice(available_medium)
-    else:
-        # Low satisfaction, use negative sentiment
-        # Higher chance of using a different negative sentiment than initial
-        if initial_sentiment in low_satisfaction and random.random() < 0.3:
-            return initial_sentiment
-        return random.choice(available_low)
+    return satisfaction, explanation
 
 # Data utility functions
 def load_json_file(file_path):
@@ -310,24 +238,9 @@ def load_seed_data(seed_data_dir='seed_data'):
         'topics_with_expectations': topics_with_expectations,
         'topics': topics,
         'user_expectations': None,  # No longer needed with the merged structure
-        'user_sentiments': load_json_file(base_dir / "user_sentiments.json"),
         'conversation_styles': load_json_file(base_dir / "conversation_styles.json"),
         'chatbot_personas': load_json_file(base_dir / "chatbot_personas.json")
     }
-
-def select_random_sentiment(user_sentiments):
-    """
-    Select a random sentiment from available sentiments.
-    
-    Args:
-        user_sentiments: List of available sentiments
-        
-    Returns:
-        Selected sentiment string
-    """
-    # Give "No sentiment" a higher weight
-    weights = [3 if sentiment == "No sentiment" else 1 for sentiment in user_sentiments]
-    return random.choices(user_sentiments, weights=weights, k=1)[0]
 
 def select_chatbot_persona(chatbot_personas):
     """
@@ -351,7 +264,7 @@ def select_chatbot_persona(chatbot_personas):
 
 def save_dataset(dataset, filename="multi_llm_chatbot_dataset.json"):
     """
-    Save the generated dataset to a JSON file with timestamp.
+    Save the generated dataset to a JSON file with timestamp in the generations folder.
     
     Args:
         dataset: List of conversation data
@@ -366,7 +279,13 @@ def save_dataset(dataset, filename="multi_llm_chatbot_dataset.json"):
     
     # Add timestamp to filename
     base_name, ext = os.path.splitext(filename)
-    output_file = f"{base_name}_{timestamp}{ext}"
+    
+    # Ensure generations directory exists
+    generations_dir = "generations"
+    os.makedirs(generations_dir, exist_ok=True)
+    
+    # Create path in generations directory
+    output_file = os.path.join(generations_dir, f"{base_name}_{timestamp}{ext}")
     
     # Save the dataset
     with open(output_file, 'w', encoding='utf-8') as f:
