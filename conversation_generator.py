@@ -1,271 +1,274 @@
+"""
+Simplified role-based conversation generator that focuses on realistic human-like
+interactions without complex emotional metrics or analysis.
+"""
+
+import json
 import random
+import os
+from datetime import datetime
 from models import LLM
-from prompts import construct_user_message, construct_chatbot_response
-from conversation_utils import (
-    select_conversation_style, 
-    load_seed_data,  
-    select_chatbot_persona, 
-    save_dataset,
-    select_topic_with_expectation,
-    calculate_user_satisfaction
-)
+from user_reflection import get_adaptive_user_message
 
-class ConversationGenerator:
-    """
-    Generate realistic conversations between a user and a chatbot.
-    """
-    
-    def __init__(self, LLMs):
+class RoleBasedConversationGenerator:
+    def __init__(self, llm_models=["GPT-4o", "CLAUDE-3.7-SONNET"]):
         """
-        Initialize the conversation generator with seed data.
-        """
-        self.seed_data = load_seed_data()
-        self.topics = self.seed_data['topics']
-        self.chatbot_personas = self.seed_data['chatbot_personas']
-        self.conversation_styles = self.seed_data['conversation_styles']
-        self.topics_with_expectations = self.seed_data['topics_with_expectations']
-        self.LLMs = LLMs
-    
-    def _select_random_topic(self):
-        """
-        Select a random topic from the available topics.
-        
-        Returns:
-            Tuple of (topic_category, specific_topic)
-        """
-        # Select a random category
-        topic_category = random.choice(list(self.topics.keys()))
-        
-        # Select a random topic from the category
-        specific_topic = random.choice(self.topics[topic_category])
-        
-        return topic_category, specific_topic
-    
-    def generate_user_message(self, topic, conversation_history, style_profile, user_expectation=None, user_satisfaction=1.0, satisfaction_explanation=None):
-        """
-        Generate a user message.
+        Initialize the conversation generator.
         
         Args:
-            topic: Conversation topic
-            conversation_history: Previous conversation turns
-            style_profile: Dictionary of conversation style selections
-            user_expectation: Dictionary containing intent and expectation
-            user_satisfaction: Float indicating user satisfaction level (0.0 to 1.0)
-            satisfaction_explanation: Optional explanation of the satisfaction score
-            
-        Returns:
-            Generated user message
+            llm_models: List of LLM models to use for generation
         """
-        # Format conversation history for prompt builder
-        formatted_history = []
-        for item in conversation_history:
-            if isinstance(item, tuple):
-                if len(item) >= 3:
-                    # This item contains satisfaction explanation data
-                    speaker, text, explanation = item
-                    formatted_history.append(f"{speaker}: {text}")
-                else:
-                    speaker, text = item
-                    formatted_history.append(f"{speaker}: {text}")
+        self.llm_models = llm_models
+        self.primary_llm = llm_models[0] if llm_models else "GPT-4o"
         
-        # We're now passing the satisfaction_explanation directly to the construct_user_message function
-        # The satisfaction explanation will be included in the prompt directly by prompts.py
-        prompt = construct_user_message(
-            topic=topic,
-            conversation_history="\n".join(formatted_history),
-            style_profile=style_profile,
-            conversation_styles=self.conversation_styles,
-            user_expectation=user_expectation,
-            user_satisfaction=user_satisfaction
-        )
+        # Load scenarios from simplified scenarios file
+        self.scenarios = self._load_scenarios()
         
-        # For debugging: uncomment to see the prompts
-        # print(prompt)
-        
-        llm = LLM(random.choice(self.LLMs), gen_params={"max_new_tokens": 256})
-        message = llm.generate(prompt)
-        return message
+        # Create output directory if it doesn't exist
+        os.makedirs("generations", exist_ok=True)
     
-    def generate_chatbot_message(self, user_message, conversation_history, chatbot_type, chatbot_traits):
+    def _load_scenarios(self):
+        """Load role-based scenarios from the JSON file."""
+        try:
+            with open("seed_data/simplified_scenarios.json", "r") as f:
+                scenarios = json.load(f)
+                print("Loaded role-based scenarios")
+                return scenarios
+        except Exception as e:
+            print(f"Error loading scenarios: {e}")
+            return {}
+    
+    def _construct_chatbot_prompt(self, role_description, conversation_history):
         """
-        Generate a chatbot message.
+        Construct the prompt for the chatbot response.
         
         Args:
-            user_message: The user message to respond to
-            conversation_history: Previous conversation turns
-            chatbot_type: Type of chatbot persona
-            chatbot_traits: Dictionary of chatbot traits
+            role_description: Description of the user's role and situation
+            conversation_history: List of tuples with (speaker, message)
             
         Returns:
-            Generated chatbot message
+            Formatted prompt string
         """
-        # Format conversation history for prompt builder
-        formatted_history = []
-        for item in conversation_history[:-1]:  # Exclude the latest user message
-            if isinstance(item, tuple):
-                speaker, text = item[:2]  # Get just the speaker and text, ignore any metadata
-                formatted_history.append(f"{speaker}: {text}")
-            else:
-                formatted_history.append(f"{item[0]}: {item[1]}")
+        # Format conversation history
+        formatted_history = ""
+        for speaker, message in conversation_history:
+            formatted_history += f"{speaker}: {message}\n\n"
         
-        prompt = construct_chatbot_response(
-            chatbot_type=chatbot_type,
-            traits=chatbot_traits,
-            user_message=user_message,
-            conversation_history="\n".join(formatted_history) if formatted_history else ""
-        )
-        
-        llm = LLM(random.choice(self.LLMs))
-        message = llm.generate(prompt)
-        return message
-    
-    def generate_conversation(self, min_turns=3, max_turns=7, topic_category=None, topic=None, 
-                              chatbot_type=None, traits=None):
-        """
-        Generate a complete conversation between a user and a chatbot.
-        
-        Args:
-            min_turns: Minimum number of conversation turns
-            max_turns: Maximum number of conversation turns
-            topic_category: Optional specific topic category
-            topic: Optional specific topic
-            chatbot_type: Optional specific chatbot persona type
-            traits: Optional specific chatbot traits
-            
-        Returns:
-            Dictionary with conversation data
-        """
-        # Define variables for user expectation
-        user_expectation = None
-        
-        # If both category and specific topic are provided
-        if topic_category and topic:
-            # Try to find expectations for this topic in the merged structure
-            if topic_category in self.topics_with_expectations:
-                for subtopic_key, subtopic_data in self.topics_with_expectations[topic_category].items():
-                    if subtopic_data["topic"] == topic:
-                        # Found the matching topic, select a random expectation
-                        user_expectation = random.choice(subtopic_data["expectations"])
-                        break
-        # Otherwise select a random topic with expectations
-        else:
-            topic_category, topic, user_expectation = select_topic_with_expectation(self.topics_with_expectations)
-        
-        # Select random chatbot persona if not specified
-        if chatbot_type is None:
-            chatbot_type, traits = select_chatbot_persona(self.chatbot_personas)
-        
-        # Generate conversation style
-        style_profile = select_conversation_style(self.conversation_styles)
-        
-        # Initialize conversation data
-        conversation_data = {
-            "Chatbot Persona": chatbot_type,
-            "Topic Category": topic_category,
-            "Topic": topic,
-            "User Conversation Style": style_profile,
-            "User Expectation": user_expectation,
-            "Satisfaction Scores": [],  # Add a list to track satisfaction scores
-            "Satisfaction Explanations": [],  # Add a list to track satisfaction explanations
-            "Turns": []
-        }
+        prompt = f"""You are an AI assistant engaging with a user who has the following situation:
 
-        # Initialize conversation history
-        conversation_history = []
-        user_satisfaction = 0.5  # Start with neutral satisfaction
-        satisfaction_explanation = None
+USER'S SITUATION:
+{role_description}
+
+CONVERSATION HISTORY:
+{formatted_history}
+
+Respond to the user's most recent message. Be conversational and engage with their specific needs. Your response should be helpful but realistic - don't over-promise or provide generic advice. Sometimes the user may be frustrated or unclear - respond naturally to this as a helpful but imperfect assistant would.
+
+AI response:"""
         
-        # Determine number of turns
-        turn_count = random.randint(min_turns, max_turns)
+        return prompt
+    
+    def _generate_chatbot_response(self, role_description, conversation_history):
+        """
+        Generate a response from the chatbot based on the conversation context.
         
-        # Generate conversation turns
-        for i in range(turn_count):
-            # Update satisfaction for non-first messages
-            if i > 0:
-                user_satisfaction, satisfaction_explanation = calculate_user_satisfaction(conversation_history, user_expectation, i)
-                
-                # Add the satisfaction score and explanation to the lists
-                conversation_data["Satisfaction Scores"].append(user_satisfaction)
-                conversation_data["Satisfaction Explanations"].append(satisfaction_explanation)
-                
-                # Check if user satisfaction is above threshold (0.8) and end conversation if it is
-                if user_satisfaction > 0.8:
+        Args:
+            role_description: Description of the user's role and situation
+            conversation_history: List of tuples with (speaker, message)
+            
+        Returns:
+            Generated response as a string
+        """
+        prompt = self._construct_chatbot_prompt(role_description, conversation_history)
+        llm = LLM(self.primary_llm)
+        response = llm.generate(prompt)
+        
+        return response
+    
+    def _get_initial_user_message(self, scenario_data):
+        """
+        Generate an initial user message based on the role description.
+        
+        Args:
+            scenario_data: Dictionary containing the role details
+            
+        Returns:
+            Generated initial message as a string
+        """
+        role_description = scenario_data.get("role_description", "")
+        emotional_traits = scenario_data.get("emotional_traits", "")
+        
+        prompt = f"""You are roleplaying as someone in the following situation:
+
+{role_description}
+
+Your emotional characteristics:
+{emotional_traits}
+
+Write a single, authentic opening message from this person seeking help with their situation. 
+The message should:
+1. Be written in first person
+2. Clearly express the core problem they're facing
+3. Include emotional content that reflects their state
+4. Be between 2-4 sentences in length
+5. Sound natural and conversational, not overly formal
+6. Not include any meta-commentary or explanation
+
+Opening message:"""
+        
+        llm = LLM(self.primary_llm)
+        initial_message = llm.generate(prompt).strip()
+        
+        return initial_message
+    
+    def generate_conversation(self, scenario_data, min_turns=3, max_turns=10):
+        """
+        Generate a complete conversation based on the given role.
+        
+        Args:
+            scenario_data: Dictionary containing the role details
+            min_turns: Minimum conversation turns
+            max_turns: Maximum conversation turns
+            
+        Returns:
+            Dictionary containing the complete conversation data
+        """
+        # Extract scenario information
+        role_description = scenario_data.get("role_description", "")
+        emotional_traits = scenario_data.get("emotional_traits", "")
+        topic = scenario_data.get("topic", "General conversation")
+        category = scenario_data.get("category", "Uncategorized")
+        
+        # Initialize conversation
+        conversation = []
+        reflections = []
+        
+        # Generate initial user message
+        initial_message = self._get_initial_user_message(scenario_data)
+        conversation.append(("User", initial_message))
+        
+        # First turn has no reflection data yet
+        current_turn = 1
+        print(f"Generating turn {current_turn}...")
+        
+        # Generate chatbot response to initial message
+        chatbot_response = self._generate_chatbot_response(role_description, conversation)
+        conversation.append(("Chatbot", chatbot_response))
+        
+        # Initialize tracking variables
+        should_continue = True
+        ending_reason = "Max Turns Reached"
+        
+        # Continue conversation for a minimum number of turns and up to max
+        while (current_turn < max_turns) and should_continue:
+            current_turn += 1
+            print(f"Generating turn {current_turn}...")
+            
+            # Get adaptive user response with reflection
+            user_message, reflection = get_adaptive_user_message(
+                scenario_data, 
+                conversation,
+                current_turn
+            )
+            
+            conversation.append(("User", user_message))
+            reflections.append(reflection)
+            
+            # Check if we've reached minimum turns
+            if current_turn >= min_turns:
+                # Check if the conversation should continue
+                should_continue = reflection.get("should_continue", True)
+                if not should_continue:
+                    ending_reason = reflection.get("ending_reason", "User ended the conversation")
                     break
-                
-                # Store the last chatbot's message and explanation for user prompt generation
-                if len(conversation_history) > 0 and satisfaction_explanation:
-                    # Update the last message to include the explanation if it's not already there
-                    last_message = conversation_history[-1]
-                    if isinstance(last_message, tuple) and len(last_message) == 2:
-                        # Add the explanation to the tuple
-                        conversation_history[-1] = (last_message[0], last_message[1], satisfaction_explanation)
             
-            # Generate user message
-            user_message = self.generate_user_message(
-                topic=topic,
-                conversation_history=conversation_history,
-                style_profile=style_profile,
-                user_expectation=user_expectation,
-                user_satisfaction=user_satisfaction,
-                satisfaction_explanation=satisfaction_explanation
-            )
-            
-            # Add user message to history
-            conversation_history.append(("User", user_message))
-            
-            # Save user message data
-            user_data = {
-                "speaker": "User",
-                "text": user_message
-            }
-            
-            turn = {"User": user_data}
-            
-            # Generate chatbot message
-            chatbot_message = self.generate_chatbot_message(
-                user_message=user_message,
-                conversation_history=conversation_history,
-                chatbot_type=chatbot_type,
-                chatbot_traits=traits
-            )
-            
-            # Add chatbot message to history
-            # Save it as a tuple of (speaker, message) - the satisfaction evaluation will update this with the explanation
-            conversation_history.append(("Chatbot", chatbot_message))
-            
-            # Save chatbot message data
-            chatbot_data = {
-                "speaker": "Chatbot",
-                "text": chatbot_message
-            }
-            turn["Chatbot"] = chatbot_data
-            
-            # Add the complete turn to the conversation data
-            conversation_data["Turns"].append(turn)
+            # Generate chatbot response
+            chatbot_response = self._generate_chatbot_response(role_description, conversation)
+            conversation.append(("Chatbot", chatbot_response))
         
-        return conversation_data
+        # Create result object
+        result = {
+            "category": category,
+            "topic": topic,
+            "role_description": role_description,
+            "emotional_traits": emotional_traits,
+            "conversation": conversation,
+            "reflections": reflections,
+            "ending_reason": ending_reason,
+            "turns": (len(conversation) + 1) // 2  # Each turn is a user message and a chatbot response
+        }
+        
+        return result
     
-    def generate_dataset(self, n_iterations=5, min_turns=3, max_turns=7, filename="multi_llm_chatbot_dataset.json"):
+    def generate_dataset(self, iterations=5, min_turns=3, max_turns=7, output_file="realistic_conversations.json"):
         """
-        Generate a dataset of multiple conversations.
+        Generate a dataset of conversations across various roles.
         
         Args:
-            n_iterations: Number of conversations to generate
-            min_turns: Minimum number of turns per conversation
-            max_turns: Maximum number of turns per conversation
-            filename: Base filename for the output dataset
+            iterations: Number of conversations to generate
+            min_turns: Minimum conversation turns
+            max_turns: Maximum conversation turns
+            output_file: Output file path
             
         Returns:
-            List of generated conversations
+            Generated dataset as a dictionary
         """
         dataset = []
+        categories = list(self.scenarios.keys())
+        ending_reasons_count = {}
         
-        for i in range(n_iterations):
-            print(f"Generating conversation {i+1}/{n_iterations}...")
-            conversation = self.generate_conversation(min_turns=min_turns, max_turns=max_turns)
-            dataset.append(conversation)
+        print(f"Generating {iterations} role-based conversations")
+        print(f"Each conversation will have between {min_turns} and {max_turns} turns")
         
-        # Save the dataset
-        save_dataset(dataset, filename)
+        # Generate conversations
+        for i in range(1, iterations + 1):
+            print(f"Generating conversation {i}/{iterations}...")
+            
+            # Randomly select a category and scenario
+            category = random.choice(categories)
+            scenario_name = random.choice(list(self.scenarios[category].keys()))
+            scenario_data = self.scenarios[category][scenario_name]
+            scenario_data["category"] = category
+            
+            # Generate conversation
+            result = self.generate_conversation(
+                scenario_data,
+                min_turns=min_turns,
+                max_turns=max_turns
+            )
+            
+            # Add to dataset
+            dataset.append(result)
+            
+            # Update statistics
+            ending_reason = result["ending_reason"]
+            ending_reasons_count[ending_reason] = ending_reasons_count.get(ending_reason, 0) + 1
+            
+            # Save incremental result
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            incremental_file = f"generations/realistic_conversation_{timestamp}.json"
+            
+            with open(incremental_file, "w") as f:
+                json.dump(dataset, f, indent=2)
+            
+            print(f"Completed conversation {i}, category: {category}, scenario: {scenario_name}")
+            print(f"- Turns: {result['turns']}")
+            print(f"- Ending reason: {result['ending_reason']}")
+            print()
+        
+        # Save final dataset
+        with open(output_file, "w") as f:
+            json.dump(dataset, f, indent=2)
+        
+        print(f"Dataset saved to {output_file}")
+        
+        # Print statistics
+        print("Statistics:")
+        print(f"- Total conversations: {len(dataset)}")
+        print(f"- Total turns: {sum(r['turns'] for r in dataset)}")
+        print(f"- Average turns per conversation: {sum(r['turns'] for r in dataset) / len(dataset):.2f}")
+        print("Ending reasons:")
+        for reason, count in ending_reasons_count.items():
+            print(f"- {reason}: {count}")
         
         return dataset

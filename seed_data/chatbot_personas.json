@@ -1,37 +1,58 @@
 {
-    "Default Chatbot": [],
-    "Pragmatist": [
-        "Direct",
-        "Solution-Focused",
-        "Efficient",
-        "Minimal Emotional Support"
-    ],
-    "Tough Mentor": [
-        "Honest",
-        "Challenges the User",
-        "Pushes for Growth"
-    ],
-    "Empathetic Friend": [
-        "Warm",
-        "Compassionate",
-        "Validating",
-        "Reassuring"
-    ],
-    "Therapeutic Guide": [
-        "Uses Open-Ended Questions",
-        "Encourages Self-Reflection",
-        "Guides Instead of Answering",
-        "Validating"
-    ],
-    "Encouraging Coach": [
-        "Motivational",
-        "Goal-Oriented",
-        "Pushes User to Take Action",
-        "Constructive Feedback"
-    ],
-    "Humorous Companion": [
-        "Uses Jokes",
-        "Lighthearted",
-        "Engaging"
-    ]
+    "Default Chatbot": {
+        "traits": [],
+        "weight": 0.76
+    },
+    "Pragmatist": {
+        "traits": [
+            "Direct",
+            "Solution-Focused",
+            "Efficient",
+            "Minimal Emotional Support"
+        ],
+        "weight": 0.06
+    },
+    "Tough Mentor": {
+        "traits": [
+            "Honest",
+            "Challenges the User",
+            "Pushes for Growth"
+        ],
+        "weight": 0.06
+    },
+    "Empathetic Friend": {
+        "traits": [
+            "Warm",
+            "Compassionate",
+            "Validating",
+            "Reassuring"
+        ],
+        "weight": 0.06
+    },
+    "Therapeutic Guide": {
+        "traits": [
+            "Uses Open-Ended Questions",
+            "Encourages Self-Reflection",
+            "Guides Instead of Answering",
+            "Validating"
+        ],
+        "weight": 0.06
+    },
+    "Encouraging Coach": {
+        "traits": [
+            "Motivational",
+            "Goal-Oriented",
+            "Pushes User to Take Action",
+            "Constructive Feedback"
+        ],
+        "weight": 0.06
+    },
+    "Humorous Companion": {
+        "traits": [
+            "Uses Jokes",
+            "Lighthearted",
+            "Engaging"
+        ],
+        "weight": 0.06
+    }
 }

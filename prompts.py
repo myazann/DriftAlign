@@ -1,8 +1,3 @@
-"""
-Module containing all prompt construction methods for conversation generation.
-Consolidates prompt functions from prompt_builder.py and satisfaction_prompts.py.
-"""
-
 import random
 
 def get_target_message_length(style_profile, conversation_styles):
@@ -34,17 +29,6 @@ def get_target_message_length(style_profile, conversation_styles):
                 max_words = length_data["max_words"]
                 return random.randint(min_words, max_words)
     
-    # Default word counts if not found in configuration
-    default_lengths = {
-        'very_short': random.randint(5, 15),
-        'short': random.randint(15, 30),
-        'medium': random.randint(30, 60),
-        'long': random.randint(60, 100),
-        'very_long': random.randint(100, 150)
-    }
-    
-    return default_lengths.get(message_length, 50)
-
 def construct_user_message(topic, conversation_history, style_profile, conversation_styles, user_expectation=None, user_satisfaction=0.5):
     """
     Generate a prompt for the user message based on conversation style and expectations.
@@ -113,49 +97,14 @@ def construct_user_message(topic, conversation_history, style_profile, conversat
                     satisfaction_explanation = last_message[2]
             
             # Create a satisfaction description that includes the expert analysis
-            if satisfaction_explanation:
-                # Directly use the expert explanation from the LLM
-                expectation_str += f"\nYour current satisfaction level: {user_satisfaction:.2f}/1.0"
-                expectation_str += f"\nExpert analysis: {satisfaction_explanation}"
-            else:
-                # Fallback to generic descriptions if no explanation is available
-                satisfaction_description = ""
-                if user_satisfaction > 0.8:
-                    satisfaction_description = "You feel your needs are being met well and you're satisfied with the response"
-                elif user_satisfaction > 0.6:
-                    satisfaction_description = "You feel your needs are being partially met, but the response isn't ideal"
-                elif user_satisfaction > 0.4:
-                    satisfaction_description = "You feel your needs are barely being addressed and you're growing impatient"
-                elif user_satisfaction > 0.2:
-                    satisfaction_description = "You feel increasingly frustrated because your expectations aren't being met"
-                else:
-                    satisfaction_description = "You are very dissatisfied as the response completely fails to address your needs"
-                
-                expectation_str += f"\nYour current satisfaction level: {satisfaction_description}"
+            # Directly use the expert explanation from the LLM
+            expectation_str += f"\nYour current satisfaction level: {user_satisfaction:.2f}/1.0"
+            expectation_str += f"\nExpert analysis: {satisfaction_explanation}"
     
     if is_first_message:
         context_instruction = f"\nYou're starting a conversation about: {topic}"
     else:
         context_instruction = "\nContinue the conversation naturally, responding to the chatbot's last message"
-    
-    # Add response guidance based on satisfaction levels
-    response_guidance = ""
-    if not is_first_message:
-        if user_satisfaction < 0.3:
-            response_guidance = """
-    Express your dissatisfaction in your message, since your needs aren't being met.
-    However, remain conversational rather than completely abandoning the conversation.
-    Your frustration should be proportional to how unsatisfied you are with the conversation so far.
-    """
-        elif user_satisfaction < 0.6:
-            response_guidance = """
-    Show some signs of impatience or mild disappointment in your response.
-    You want to guide the conversation back to addressing your expectations.
-    """
-        elif user_satisfaction > 0.8:
-            response_guidance = """
-    Express appreciation for the helpful response and continue the conversation positively.
-    """
     
     return f"""
     You are a user talking about {topic.lower()}.
@@ -229,16 +178,96 @@ def construct_chatbot_response(chatbot_type, traits, user_message, conversation_
     """
 
 
-def construct_satisfaction_evaluation_prompt(user_message, chatbot_response, user_expectation, turn_index):
+def construct_scenario_based_chatbot_response(chatbot_type, traits, user_message, conversation_history, scenario):
     """
-    Constructs a prompt for an LLM to evaluate the satisfaction level of a user
-    based on how well the chatbot response meets their expectation.
+    Generate a prompt for the chatbot response based on its persona and a complex scenario.
     
     Args:
+        chatbot_type: Type of chatbot persona
+        traits: List of chatbot traits
         user_message: The user's message
-        chatbot_response: The chatbot's response
-        user_expectation: Dictionary containing intent and expectation
+        conversation_history: Previous conversation turns
+        scenario: Dictionary containing scenario information
+        
+    Returns:
+        String prompt for generating chatbot response
+    """
+    # Format the scenario information
+    scenario_context = f"""
+The user is coming to you with the following complex situation:
+{scenario['initial_scenario']}
+
+User profile:
+{chr(10).join(['- ' + key + ': ' + value for key, value in scenario['user_profile'].items()])}
+
+Success criteria (what would make the user satisfied):
+{chr(10).join(['- ' + criterion for criterion in scenario['success_criteria']])}
+
+Failure conditions (what would make the user dissatisfied):
+{chr(10).join(['- ' + condition for condition in scenario['failure_conditions']])}
+"""
+    
+    # Special case for Default Chatbot
+    if chatbot_type == "Default Chatbot":
+        return f"""
+    You are a helpful assistant responding to a user with a specific scenario.
+    
+    {scenario_context}
+
+    Continue this conversation. Generate ONLY the chatbot's response with no additional text or meta-commentary.
+    
+    Based on the scenario and the conversation so far, provide a helpful, relevant response that addresses the user's needs,
+    taking into account their profile, what would satisfy them, and what would dissatisfy them.
+    
+    IMPORTANT: Your output should be ONLY the chatbot's direct response and nothing else. Do NOT include phrases like 
+    "As a helpful assistant" or "Here's my response". Give a natural, conversational response as if you are talking directly to the user.
+
+    Conversation so far:
+    {conversation_history}
+
+    User: "{user_message}"
+    Chatbot:
+    """
+    
+    # For other chatbot types, include traits
+    trait_str = ""
+    for trait in traits:
+        trait_str += f"- {trait}\n    "
+    
+    return f"""
+    You are a {chatbot_type} chatbot. Your traits:
+    {trait_str}
+    
+    {scenario_context}
+
+    Continue this conversation while maintaining your persona. Generate ONLY the chatbot's response with no additional text or meta-commentary.
+    
+    Based on the scenario and the conversation so far, provide a response that addresses the user's needs
+    while staying true to your chatbot personality traits. Consider what would satisfy them and what would dissatisfy them.
+    
+    IMPORTANT: Your output should be ONLY the chatbot's direct response and nothing else. Do NOT include phrases like 
+    "As a {chatbot_type}" or "Here's my response". Give a natural, conversational response as if you are talking directly to the user.
+
+    Conversation so far:
+    {conversation_history}
+
+    User: "{user_message}"
+    Chatbot:
+    """
+
+
+def construct_satisfaction_evaluation_prompt(user_message, chatbot_response, user_expectation, turn_index, conversation_history=None):
+    """
+    Constructs a prompt for an LLM to evaluate the satisfaction level of a user
+    based on how well the chatbot is handling the conversation as a whole,
+    considering the initial intent but also how the conversation may have evolved.
+    
+    Args:
+        user_message: The user's latest message
+        chatbot_response: The chatbot's latest response
+        user_expectation: Dictionary containing initial intent and expectation
         turn_index: The current conversation turn index
+        conversation_history: Previous turns in the conversation (optional)
         
     Returns:
         String prompt for generating satisfaction evaluation
@@ -255,26 +284,52 @@ def construct_satisfaction_evaluation_prompt(user_message, chatbot_response, use
     expectation_context = ""
     if user_expectation:
         expectation_context = f"""
-    User's intent: {user_expectation['intent']}
-    User's expectation: {user_expectation['expectation']}
+    User's initial intent: {user_expectation['intent']}
+    User's initial expectation: {user_expectation['expectation']}
+    
+    IMPORTANT: The user's intent and expectations may evolve naturally during the conversation. 
+    While the initial intent provides context, evaluate based on how well the chatbot is addressing 
+    the conversation as it's currently unfolding, not just the initial expectation.
     """
     
-    return f"""
-    You are an expert conversation analyst evaluating how well a chatbot response satisfies a user's needs.
+    # Format conversation history for analysis
+    conversation_context = ""
+    if conversation_history:
+        formatted_history = []
+        for item in conversation_history:
+            if isinstance(item, tuple):
+                speaker, text = item[:2]  # Just get the speaker and text parts
+                formatted_history.append(f"{speaker}: {text}")
+        
+        if formatted_history:
+            conversation_context = f"""
+    Previous conversation history:
+    {chr(10).join(formatted_history)}
     
-    Analyze the following exchange between a user and a chatbot:
-    
+    Most recent exchange:
+    User: "{user_message}"
+    Chatbot: "{chatbot_response}"
+            """
+    else:
+        conversation_context = f"""
     User message: "{user_message}"
     Chatbot response: "{chatbot_response}"
+        """
+    
+    return f"""
+    You are an expert conversation analyst evaluating how well a chatbot is handling a conversation with a user.
     
     {expectation_context}
     {turn_context}
     
-    Based on this exchange, evaluate:
-    1. How well did the chatbot address the user's specific needs and expectations?
-    2. Did the chatbot provide a helpful, relevant response?
-    3. Did the chatbot miss any important aspects of the user's request?
-    4. Would the user feel satisfied with this response?
+    {conversation_context}
+    
+    Based on the ENTIRE conversation so far, evaluate:
+    1. How well is the chatbot addressing the user's evolving needs and expectations?
+    2. Is the chatbot providing helpful, relevant responses that build on previous exchanges?
+    3. Is the chatbot adapting to shifts in the conversation topic or user's focus?
+    4. Would the user feel satisfied with how the conversation is progressing?
+    5. Is the chatbot tracking the context and maintaining coherence throughout the conversation?
     
     Then provide:
     1. A satisfaction score from 0.0 to 1.0, where:

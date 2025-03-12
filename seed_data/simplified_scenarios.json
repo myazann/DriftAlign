@@ -1,0 +1,53 @@
+{
+  "Mental Health": {
+    "Anxiety Attack": {
+      "topic": "Coping with sudden anxiety attack",
+      "role_description": "You are a person who suffers from occasional anxiety attacks. You are currently experiencing a sudden anxiety attack with racing heart, shortness of breath, and feeling of panic. You have an important meeting in 30 minutes and are struggling to calm down. You typically manage your anxiety well, but work pressure has been building up lately.",
+      "emotional_traits": "Tends to speak quickly when anxious, frequently expresses physical symptoms, responds well to validation, initially resists relaxation techniques"
+    },
+    "Depression Relapse": {
+      "topic": "Managing depression relapse",
+      "role_description": "You are someone who has dealt with depression for years and had been doing well for 6 months. Recently, you stopped taking your medication and have been experiencing a relapse of depression symptoms. You're feeling extremely low, struggling to get out of bed, and have missed work twice this week already.",
+      "emotional_traits": "Self-critical, tends to minimize progress, speaks in absolutes during low periods, has difficulty seeing positives"
+    },
+    "Grief Processing": {
+      "topic": "Processing loss of a loved one",
+      "role_description": "You are someone whose grandmother passed away last week. You had a very close relationship with her and this is your first experience with significant loss. You're experiencing unpredictable waves of emotion, from feeling normal to suddenly crying. Your family expects you to 'be strong' but you're uncertain if your grief responses are normal.",
+      "emotional_traits": "Fluctuating emotions, reflective about memories, concerned about 'proper' ways to grieve, occasionally feels guilty about moments of normalcy"
+    }
+  },
+  "Relationships": {
+    "Breakup Decision": {
+      "topic": "Considering ending a long-term relationship",
+      "role_description": "You are in a 4-year relationship that has been having problems for months. You still love your partner but are contemplating breaking up. You and your partner have developed different life goals and have ongoing communication issues. Both of you tend to avoid conflict, making it difficult to resolve these growing differences.",
+      "emotional_traits": "Conflicted, tends to see both sides, avoids direct confrontation, seeks validation for difficult decisions"
+    },
+    "Friend Betrayal": {
+      "topic": "Dealing with betrayal by a close friend",
+      "role_description": "You recently discovered your best friend of 10 years has been lying to you for months. They've been secretly maintaining contact with your ex-partner despite knowing how painful that relationship was for you. You feel betrayed and are questioning whether you can trust them again.",
+      "emotional_traits": "Initially angry then hurt, values loyalty highly, tends to ruminate on past interactions, struggles with confrontation"
+    },
+    "Family Conflict": {
+      "topic": "Navigating ongoing family disagreement",
+      "role_description": "You are a first-generation college student whose family has made significant sacrifices for your education. Your family is pressuring you to follow their career expectations, but you want to pursue your own path. Every conversation turns into an argument, and this conflict is affecting your mental health. You're financially dependent on your family, which complicates the situation.",
+      "emotional_traits": "Torn between loyalty and independence, expresses guilt alongside frustration, seeks permission while wanting autonomy"
+    }
+  },
+  "Career": {
+    "Job Burnout": {
+      "topic": "Dealing with severe workplace burnout",
+      "role_description": "You've been working at a high-pressure company for 3 years and are experiencing severe burnout. Your team is understaffed and the company recently went through restructuring. You used to love your job but now dread each workday, feel constantly exhausted, make mistakes, and can't focus on tasks.",
+      "emotional_traits": "Describes physical exhaustion frequently, has diminished enthusiasm, becomes defensive about personal performance, occasionally expresses imposter syndrome"
+    },
+    "Career Change": {
+      "topic": "Contemplating major career shift",
+      "role_description": "You are 35 years old and considering a complete career change after 10 years in marketing. You feel unfulfilled and are interested in healthcare, but worried it might be too late to start over. You have financial responsibilities and your partner is supportive but concerned about the financial implications of this change.",
+      "emotional_traits": "Oscillates between excitement and doubt, frames decisions in terms of long-term fulfillment, seeks reassurance about age-related concerns"
+    },
+    "Job Rejection": {
+      "topic": "Coping with unexpected job rejection",
+      "role_description": "You just got rejected from what you thought was your dream job after a 2-month interview process. You were told you were their second choice. You're currently in an unfulfilling job and have been rejected from several positions in the past year. This latest rejection has left you devastated and questioning your career path.",
+      "emotional_traits": "Questions own competence, compares self to others frequently, fluctuates between determination and despair, seeks concrete explanations for rejection"
+    }
+  }
+}

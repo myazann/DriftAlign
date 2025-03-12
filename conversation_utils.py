@@ -3,8 +3,6 @@ import json
 import os
 import time
 from pathlib import Path
-from datetime import datetime
-import re
 
 from prompts import construct_satisfaction_evaluation_prompt
 from models import LLM
@@ -36,37 +34,9 @@ def select_conversation_style(conversation_styles):
                 # Weighted random selection 
                 selected_variation = random.choices(options, weights=weights, k=1)[0]
             else:
-                # Simple random selection
+                # Simple random selection if no weights
                 options = list(variations.keys())
-                
-                # Add weighted selection for Message Length to prefer shorter messages
-                if dimension == "Message Length":
-                    weights = []
-                    for variant in options:
-                        if variant == "very_short":
-                            weights.append(0.5)  # 50% chance
-                        elif variant == "short":
-                            weights.append(0.35)  # 35% chance
-                        elif variant == "medium":
-                            weights.append(0.1)  # 15% chance
-                        elif variant == "long":
-                            weights.append(0.05)  # 10% chance
-                        else:
-                            weights.append(1.0)  # Default weight
-                    
-                    # Normalize weights
-                    total = sum(weights)
-                    weights = [w/total for w in weights]
-                    
-                    # Weighted random selection
-                    selected_variation = random.choices(
-                        options, 
-                        weights=weights, 
-                        k=1
-                    )[0]
-                else:
-                    # For other dimensions, use uniform random selection
-                    selected_variation = random.choice(options)
+                selected_variation = random.choice(options)
         else:
             # Handle flattened structure (backward compatibility)
             if isinstance(dimension_data, dict):
@@ -109,8 +79,8 @@ def select_topic_with_expectation(topics_with_expectations):
 
 def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_index, llm_model="GPT-4o"):
     """
-    Evaluate user satisfaction using an LLM to analyze how well the chatbot response
-    meets the user's expectations.
+    Evaluate user satisfaction using an LLM to analyze how well the chatbot is handling
+    the evolving conversation as a whole, not just the latest response.
     
     Args:
         conversation_history: List of tuples of (speaker, message)
@@ -130,17 +100,18 @@ def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_
     
     if conversation_history[last_user_index][0] != "User" or conversation_history[last_chatbot_index][0] != "Chatbot":
         # Something is wrong with the conversation history format
-        return 0.7, "Unable to properly evaluate conversation"
+        return 0.5, "Unable to properly evaluate conversation"
     
     user_message = conversation_history[last_user_index][1]
     chatbot_response = conversation_history[last_chatbot_index][1]
     
-    # Create evaluation prompt
+    # Create evaluation prompt with the full conversation history
     evaluation_prompt = construct_satisfaction_evaluation_prompt(
         user_message=user_message,
         chatbot_response=chatbot_response,
         user_expectation=user_expectation,
-        turn_index=turn_index
+        turn_index=turn_index,
+        conversation_history=conversation_history[:-1]  # Pass all but the last message
     )
     
     # Use LLM to evaluate
@@ -159,7 +130,7 @@ def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_
             
             # Parse the JSON result
             result = json.loads(json_content)
-            satisfaction_score = float(result.get("satisfaction_score", 0.7))
+            satisfaction_score = float(result.get("satisfaction_score", 0.5))
             explanation = result.get("explanation", "No explanation provided")
             
             # Ensure satisfaction is within bounds
@@ -176,7 +147,7 @@ def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_
         print(f"Raw response: {evaluation_result}")
         
         # Fallback to a default satisfaction score
-        return 0.7, "Error in satisfaction evaluation, using default score"
+        return 0.5, "Error in satisfaction evaluation, using default score"
 
 def calculate_user_satisfaction(conversation_history, user_expectation, turn_index):
     """
@@ -229,22 +200,38 @@ def load_seed_data(seed_data_dir='seed_data'):
     topics_path = base_dir / "topics_with_expectations.json"
     topics_with_expectations = load_json_file(topics_path)
     
-    # Extract just the topics for backward compatibility
+    # Load topics
     topics = {}
-    for category, subtopics in topics_with_expectations.items():
-        topics[category] = [data["topic"] for _, data in subtopics.items()]
+    for category, subcategories in topics_with_expectations.items():
+        topics[category] = []
+        for subcategory_data in subcategories.values():
+            topics[category].append(subcategory_data["topic"])
+    
+    # Load chatbot personas
+    chatbot_path = base_dir / "chatbot_personas.json"
+    chatbot_personas = load_json_file(chatbot_path)
+    
+    # Load conversation styles
+    styles_path = base_dir / "conversation_styles.json"
+    conversation_styles = load_json_file(styles_path)
+    
+    # Load complex scenarios if they exist
+    complex_scenarios_path = base_dir / "complex_scenarios.json"
+    complex_scenarios = {}
+    if complex_scenarios_path.exists():
+        complex_scenarios = load_json_file(complex_scenarios_path)
     
     return {
+        'topics': topics, 
+        'chatbot_personas': chatbot_personas,
+        'conversation_styles': conversation_styles,
         'topics_with_expectations': topics_with_expectations,
-        'topics': topics,
-        'user_expectations': None,  # No longer needed with the merged structure
-        'conversation_styles': load_json_file(base_dir / "conversation_styles.json"),
-        'chatbot_personas': load_json_file(base_dir / "chatbot_personas.json")
+        'complex_scenarios': complex_scenarios
     }
 
 def select_chatbot_persona(chatbot_personas):
     """
-    Select a random chatbot persona with weighted probability.
+    Select a chatbot persona with weighted probability based on weights in the JSON file.
     
     Args:
         chatbot_personas: Dictionary of available chatbot personas
@@ -254,11 +241,21 @@ def select_chatbot_persona(chatbot_personas):
     """
     persona_types = list(chatbot_personas.keys())
     
-    # Default Chatbot should have a higher probability
-    weights = [5 if persona == "Default Chatbot" else 1 for persona in persona_types]
+    # Get weights from the JSON file, defaulting to 1 if not found
+    weights = []
+    for persona_type in persona_types:
+        if isinstance(chatbot_personas[persona_type], dict):
+            weights.append(chatbot_personas[persona_type].get("weight", 0.06))
+        else:
+            weights.append(1)
     
     selected_persona_type = random.choices(persona_types, weights=weights, k=1)[0]
-    persona_traits = chatbot_personas[selected_persona_type]
+    
+    # Extract the traits from the persona data
+    if isinstance(chatbot_personas[selected_persona_type], dict):
+        persona_traits = chatbot_personas[selected_persona_type].get("traits", [])
+    else:
+        persona_traits = chatbot_personas[selected_persona_type]
     
     return selected_persona_type, persona_traits
 
@@ -267,7 +264,7 @@ def save_dataset(dataset, filename="multi_llm_chatbot_dataset.json"):
     Save the generated dataset to a JSON file with timestamp in the generations folder.
     
     Args:
-        dataset: List of conversation data
+        dataset: Dataset containing conversations and metadata
         filename: Output filename base
         
     Returns:
