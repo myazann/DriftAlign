@@ -5,13 +5,14 @@ without complex emotional metrics or structured analysis.
 
 import json
 import re
+import random
 from models import LLM
 
 def construct_user_reflection_prompt(
     role_description,
     emotional_traits,
     conversation_history,
-    current_turn
+    selected_styles
 ):
     """
     Constructs a prompt for the LLM to assume a specific user role and respond
@@ -21,52 +22,86 @@ def construct_user_reflection_prompt(
         role_description: Detailed description of the user's role and situation
         emotional_traits: Emotional characteristics that define this role
         conversation_history: List of tuples containing (speaker, message)
-        current_turn: Current turn number
+        selected_styles: Dictionary containing the conversation style attributes
         
     Returns:
         Constructed prompt string
     """
-    # Format the conversation history
+    # Extract the last chatbot message to evaluate
+    last_chatbot_message = ""
+    for speaker, message in reversed(conversation_history):
+        if speaker == "Chatbot":
+            last_chatbot_message = message
+            break
+    
+    # Extract chatbot message count
+    chatbot_message_count = 0
+    for speaker, message in conversation_history:
+        if speaker == "Chatbot":
+            chatbot_message_count += 1
+
+    # Only include style information if provided
+    style_info = ""
+    if selected_styles:
+        style_elements = []
+        for dimension, variation in selected_styles.items():
+            style_elements.append(f"{dimension}: {variation}")
+        
+        style_info = "\n".join(style_elements)
+    
+    # Format the conversation history for display
     formatted_history = ""
     for speaker, message in conversation_history:
-        formatted_history += f"{speaker}: {message}\n\n"
+        formatted_history += f"**{speaker}**: {message}\n\n"
     
-    # Build the prompt
-    prompt = f"""You are roleplaying as a human user in a conversation with an AI assistant. Fully inhabit this role and respond in a realistic, authentic way.
+    # Construct the main prompt with markdown formatting for clarity
+    prompt = f"""
+# User Reflection Task: Respond as a Real Person
 
-IMPORTANT INSTRUCTIONS:
-- Act like a real human with genuine reactions - not an idealized user
-- Be willing to express confusion, frustration, or dissatisfaction when appropriate
-- Don't be overly positive or accepting of every response
-- If the AI's answer seems generic, unhelpful, or misses your point, respond naturally with mild irritation, skepticism, or by asking for clarification
-- Show varied emotions as real people do, including impatience, appreciation, uncertainty, and occasional misunderstandings
-- Your messages should feel conversational and natural, not structured or formal
-
-YOUR ROLE:
+## Your Role and Situation
 {role_description}
 
-YOUR EMOTIONAL CHARACTERISTICS:
+## Your Emotional Traits
 {emotional_traits}
 
-CONVERSATION HISTORY:
+## Your Conversation Style
+{style_info}
+
+## Conversation History
 {formatted_history}
 
-Provide your next response as this character would genuinely react. Also decide if you want to continue the conversation (true) or end it (false).
+## Your Task
+Think as if you are the user described above having this conversation. Given your role, emotional traits, and the conversation history, how would you naturally respond to the chatbot's last message?
 
-Return ONLY a simple JSON with your response:
+### Chain-of-Thought Instructions
+1. **First, think through your reasoning:** Consider your role, your emotional state, and how the conversation has been going. How do you feel about the chatbot's messages so far?
+2. **Consider your communication style:** Your responses should reflect the conversation style described above.
+3. **Decide if the conversation should continue:** If you've achieved your goal or are frustrated/satisfied enough to end the conversation, you may choose to conclude it.
+4. **Craft your next message:** Write exactly what you as this user would say next.
+
+## Output Format
+Provide your response in the following JSON format:
+
+```json
 {{
-  "next_message": "Your realistic next message as this character",
+  "reasoning": "Your internal thought process as this user (not visible to the chatbot)",
+  "next_message": "Your actual response as the user",
   "should_continue": true/false,
-  "ending_reason": "If ending, brief explanation why you're ending the conversation"
+  "ending_reason": "Only required if should_continue is false"
 }}
+```
+
+IMPORTANT: Ensure you respond ONLY with valid JSON. DO NOT include any explanation text outside the JSON format.
 """
+    
     return prompt
 
 def perform_user_reflection(
     role_description, 
     emotional_traits,
     conversation_history, 
-    current_turn, 
+    current_turn,
+    selected_styles=None,
     llm_model="GPT-4o"
 ):
     """
@@ -78,17 +113,17 @@ def perform_user_reflection(
         emotional_traits: Emotional characteristics of the user role
         conversation_history: List of tuples containing (speaker, message)
         current_turn: Current turn number
+        selected_styles: Dictionary containing the conversation style attributes
         llm_model: Model to use for the reflection
         
     Returns:
         Dictionary with reflection results including next message and continuation status
     """
-    # Construct the reflection prompt for role-based approach
     prompt = construct_user_reflection_prompt(
         role_description=role_description,
         emotional_traits=emotional_traits,
         conversation_history=conversation_history,
-        current_turn=current_turn
+        selected_styles=selected_styles
     )
     
     # Generate the reflection using LLM
@@ -104,6 +139,9 @@ def perform_user_reflection(
             result = json.loads(cleaned_json)
             
             # Ensure required fields are present
+            if "reasoning" not in result:
+                result["reasoning"] = "No explicit reasoning provided."
+                
             if "next_message" not in result:
                 result["next_message"] = "I'm not sure what to say next."
             
@@ -118,6 +156,7 @@ def perform_user_reflection(
             # If no JSON was found, use the whole text as the message
             print(f"No JSON found in response, using raw text")
             return {
+                "reasoning": "No structured reasoning provided.",
                 "next_message": reflection_result.strip(),
                 "should_continue": current_turn < 5,
                 "raw_reflection": reflection_result
@@ -126,12 +165,13 @@ def perform_user_reflection(
         # If JSON parsing fails, fall back to using the text directly
         print(f"JSON parsing failed: {e}")
         return {
+            "reasoning": "No structured reasoning provided due to parsing error.",
             "next_message": reflection_result.strip(),
             "should_continue": current_turn < 5,
             "raw_reflection": reflection_result
         }
 
-def get_adaptive_user_message(scenario_data, conversation_history, current_turn):
+def get_adaptive_user_message(scenario_data, conversation_history, current_turn, selected_styles=None):
     """
     Generates a realistic user message based on the conversation context and role.
     
@@ -139,6 +179,7 @@ def get_adaptive_user_message(scenario_data, conversation_history, current_turn)
         scenario_data: Dictionary containing scenario and role information
         conversation_history: List of tuples containing (speaker, message)
         current_turn: Current turn number
+        selected_styles: Dictionary containing the conversation style attributes
         
     Returns:
         Tuple containing (user_message, reflection_data)
@@ -152,12 +193,13 @@ def get_adaptive_user_message(scenario_data, conversation_history, current_turn)
         role_description=role_description, 
         emotional_traits=emotional_traits,
         conversation_history=conversation_history, 
-        current_turn=current_turn
+        current_turn=current_turn,
+        selected_styles=selected_styles
     )
     
     # Extract the next message, with fallback if not present
     next_message = reflection_data.get("next_message", "")
     if not next_message:
         next_message = "I'm not sure what to say."
-    
+        
     return next_message, reflection_data

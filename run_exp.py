@@ -9,7 +9,7 @@ from conversation_generator import RoleBasedConversationGenerator
 def main():
     # Set up command line arguments
     parser = argparse.ArgumentParser(description='Generate emotionally dynamic conversations using role-based scenarios.')
-    parser.add_argument('--iterations', type=int, default=5,
+    parser.add_argument('--iterations', type=int, default=3,
                         help='Number of conversations to generate (default: 5)')
     parser.add_argument('--min-turns', type=int, default=3,
                         help='Minimum number of turns per conversation (default: 3)')
