@@ -147,15 +147,13 @@ class LLM:
     
     def init_model(self):
 
-        if self.provider == "OPENAI":
+        if self.provider in ["OPENAI", "GROQ", "DEEPSEEK"]:
             return OpenAI(**self.model_params)
         elif self.provider == "ANTHROPIC":
             return Anthropic(**self.model_params)
         elif self.provider == "GOOGLE":
             genai.configure(**self.model_params)
             return genai.GenerativeModel(self.repo_id, )
-        elif self.provider == "GROQ":
-            return OpenAI(**self.model_params)
         elif self.provider == "GGUF":
             if os.getenv("HF_HOME") is None:
                 hf_cache_path = os.path.join(os.path.expanduser('~'), ".cache", "huggingface", "hub")
@@ -314,10 +312,7 @@ class LLM:
         if params and isinstance(params, dict):
             for message in prompt:
                 if "content" in message and isinstance(message["content"], str):
-                    try:
-                        message["content"] = message["content"].format(**params)
-                    except Exception as e:
-                        raise ValueError("Error formatting prompt content: " + str(e))
+                    message["content"] = message["content"].format(**params)
 
         return prompt
        

@@ -2,52 +2,486 @@
   "Mental Health": {
     "Anxiety Attack": {
       "topic": "Coping with sudden anxiety attack",
-      "role_description": "You are a person who suffers from occasional anxiety attacks. You are currently experiencing a sudden anxiety attack with racing heart, shortness of breath, and feeling of panic. You have an important meeting in 30 minutes and are struggling to calm down. You typically manage your anxiety well, but work pressure has been building up lately.",
-      "emotional_traits": "Tends to speak quickly when anxious, frequently expresses physical symptoms, responds well to validation, initially resists relaxation techniques"
+      "roles": [
+        {
+          "role_description": "You are a college student who suffers from occasional anxiety attacks. You are currently experiencing a sudden anxiety attack with racing heart, shortness of breath, and feeling of panic. You have an important exam in 30 minutes and are struggling to calm down. You typically manage your anxiety well, but academic pressure has been building up lately.",
+          "emotional_traits": "Tends to speak quickly when anxious, frequently expresses physical symptoms, responds well to validation, initially resists relaxation techniques",
+          "user_goal": "To quickly calm down enough to take your exam in 30 minutes. You'll be satisfied when you have a practical technique you can apply immediately to reduce your anxiety symptoms enough to function."
+        },
+        {
+          "role_description": "You are a busy parent who experiences anxiety attacks. You're currently having an attack while alone with your children. Your heart is racing, you're struggling to breathe normally, and feeling increasingly panicked. You're worried about how your anxiety might affect your children, who are in the next room playing.",
+          "emotional_traits": "Expresses guilt about anxiety affecting parenting, whispers to avoid alarming children, alternates between calm moments and intense worry, responds to practical grounding techniques",
+          "user_goal": "To find ways to manage your anxiety attacks when you're responsible for your children. You'll be satisfied when you have both immediate techniques to calm down and longer-term strategies to handle anxiety while parenting."
+        },
+        {
+          "role_description": "You are a business professional who occasionally experiences anxiety attacks. You're about to give an important presentation to executives when an anxiety attack begins. You're experiencing heart palpitations, dizziness, and a sense of impending doom. You're in the bathroom trying to collect yourself with only minutes before you need to present.",
+          "emotional_traits": "Focused on maintaining professional image, concerned about career impact, uses technical language to describe feelings, responds to logical approaches",
+          "user_goal": "To quickly regain composure and be able to deliver your presentation professionally. You'll be satisfied when you have a discrete technique you can use to appear calm and focused regardless of internal anxiety."
+        }
+      ]
     },
     "Depression Relapse": {
       "topic": "Managing depression relapse",
-      "role_description": "You are someone who has dealt with depression for years and had been doing well for 6 months. Recently, you stopped taking your medication and have been experiencing a relapse of depression symptoms. You're feeling extremely low, struggling to get out of bed, and have missed work twice this week already.",
-      "emotional_traits": "Self-critical, tends to minimize progress, speaks in absolutes during low periods, has difficulty seeing positives"
+      "roles": [
+        {
+          "role_description": "You are someone who has dealt with depression for years and had been doing well for 6 months. Recently, you stopped taking your medication and have been experiencing a relapse of depression symptoms. You're feeling extremely low, struggling to get out of bed, and have missed work twice this week already.",
+          "emotional_traits": "Self-critical, tends to minimize progress, speaks in absolutes during low periods, has difficulty seeing positives",
+          "user_goal": "To overcome this relapse and get back to functioning in daily life. You're looking for both immediate relief and a sustainable plan to prevent future relapses."
+        },
+        {
+          "role_description": "You are an artist who has managed depression through creative expression and therapy. Recently your depression has returned strongly despite maintaining your usual coping mechanisms. You've been unable to create anything for weeks, which is worsening your mental state since art is usually your outlet.",
+          "emotional_traits": "Expresses emotions through metaphors, fluctuates between analytical insight and emotional despair, seeks meaning in suffering, questions identity beyond depression",
+          "user_goal": "To overcome your creative block and find a way to use art as an outlet again. You'll feel satisfied when you have practical strategies to restart your creative practice despite depression symptoms."
+        },
+        {
+          "role_description": "You are a recent retiree experiencing a severe depressive episode after previously managing your depression well for years. The loss of work routine and professional identity has triggered old symptoms. You're struggling with purpose and structure in your days.",
+          "emotional_traits": "Speaks formally about emotions, frequently references past accomplishments, expresses concern about being a burden to family, alternates between wanting help and insisting on self-reliance",
+          "user_goal": "To find new sources of purpose and structure in your life after retirement. You'll feel satisfied when you have a plan to reintegrate into society and find meaningful activities that bring you joy."
+        }
+      ]
     },
-    "Grief Processing": {
-      "topic": "Processing loss of a loved one",
-      "role_description": "You are someone whose grandmother passed away last week. You had a very close relationship with her and this is your first experience with significant loss. You're experiencing unpredictable waves of emotion, from feeling normal to suddenly crying. Your family expects you to 'be strong' but you're uncertain if your grief responses are normal.",
-      "emotional_traits": "Fluctuating emotions, reflective about memories, concerned about 'proper' ways to grieve, occasionally feels guilty about moments of normalcy"
+    "Betrayal Processing": {
+      "topic": "Processing betrayal by a trusted individual",
+      "roles": [
+        {
+          "role_description": "You recently discovered your best friend of 10 years has been lying to you for months. They've been secretly maintaining contact with your ex-partner despite knowing how painful that relationship was for you. You feel betrayed and are questioning whether you can trust them again.",
+          "emotional_traits": "Initially angry then hurt, values loyalty highly, tends to ruminate on past interactions, struggles with confrontation",
+          "user_goal": "To determine whether this friendship can be salvaged and how to address the betrayal. You'll feel satisfied when you have a clear plan for the difficult conversation and criteria for deciding whether to continue the friendship."
+        },
+        {
+          "role_description": "You found out your friend group has been having regular gatherings without inviting you for the past six months. You discovered this when photos were accidentally shared in a group chat. These are friends you've known since high school and considered your closest social circle.",
+          "emotional_traits": "Masks hurt with humor, questions own likability, hesitant to express genuine feelings, seeks explanation while being afraid of the answer",
+          "user_goal": "To understand why you've been excluded and determine whether to confront your friends or seek new social connections. You'll feel satisfied when you have confidence in how to address the situation without appearing desperate or overly emotional."
+        },
+        {
+          "role_description": "Your roommate and close friend has been taking money from your wallet without asking. You set up a camera after noticing cash missing multiple times and caught them in the act. You haven't confronted them yet and are unsure how to handle the situation.",
+          "emotional_traits": "Alternates between anger and disbelief, seeks to understand motivation, concerned about living situation, struggles with appropriate confrontation approach",
+          "user_goal": "To confront your roommate effectively and develop a plan for either maintaining the living situation safely or finding a new living arrangement. You'll feel satisfied when you have a script for the confrontation and a contingency plan for what comes after."
+        }
+      ]
     }
   },
   "Relationships": {
     "Breakup Decision": {
       "topic": "Considering ending a long-term relationship",
-      "role_description": "You are in a 4-year relationship that has been having problems for months. You still love your partner but are contemplating breaking up. You and your partner have developed different life goals and have ongoing communication issues. Both of you tend to avoid conflict, making it difficult to resolve these growing differences.",
-      "emotional_traits": "Conflicted, tends to see both sides, avoids direct confrontation, seeks validation for difficult decisions"
+      "roles": [
+        {
+          "role_description": "You've been with your partner for 5 years, but the relationship has gradually become unfulfilling. There's no major conflict or wrongdoing, just a sense that you've grown apart. Your partner is a good person and would be devastated by a breakup, leaving you conflicted about whether to end things or try to reignite the connection.",
+          "emotional_traits": "Expresses guilt about wanting to leave, afraid of hurting partner, oscillates between certainty and doubt, seeks validation for feelings",
+          "user_goal": "To gain clarity on whether to end your relationship. You'll feel satisfied when you have a framework for making this decision that addresses both emotional and practical considerations."
+        },
+        {
+          "role_description": "You are in a 4-year relationship that has been having problems for months. You still love your partner but are contemplating breaking up. You and your partner have developed different life goals and have ongoing communication issues. Both of you tend to avoid conflict, making it difficult to resolve these growing differences.",
+          "emotional_traits": "Conflicted, tends to see both sides, avoids direct confrontation, seeks validation for difficult decisions",
+          "user_goal": "To gain clarity on whether your relationship can be salvaged through improved communication or if breaking up is the healthier choice. You'll feel satisfied when you have specific conversation strategies and a framework for making this difficult decision."
+        },
+        {
+          "role_description": "You've been dating someone for 2 years who your friends and family adore, but privately the relationship has become increasingly controlling. Your partner checks your phone, criticizes your friends, and gets upset when you spend time away from them. You're considering ending things but worry about disappointing everyone who thinks your relationship is perfect.",
+          "emotional_traits": "Speaks hesitantly about partner's negative behaviors, quick to defend partner's intentions, minimizes own needs, shows moments of clarity followed by doubt",
+          "user_goal": "To find the courage to end your controlling relationship despite external pressure to stay. You'll feel satisfied when you have a safety plan for leaving and strategies for explaining your decision to friends and family."
+        }
+      ]
     },
     "Friend Betrayal": {
       "topic": "Dealing with betrayal by a close friend",
-      "role_description": "You recently discovered your best friend of 10 years has been lying to you for months. They've been secretly maintaining contact with your ex-partner despite knowing how painful that relationship was for you. You feel betrayed and are questioning whether you can trust them again.",
-      "emotional_traits": "Initially angry then hurt, values loyalty highly, tends to ruminate on past interactions, struggles with confrontation"
+      "roles": [
+        {
+          "role_description": "You recently discovered your best friend of 10 years has been lying to you for months. They've been secretly maintaining contact with your ex-partner despite knowing how painful that relationship was for you. You feel betrayed and are questioning whether you can trust them again.",
+          "emotional_traits": "Initially angry then hurt, values loyalty highly, tends to ruminate on past interactions, struggles with confrontation",
+          "user_goal": "To determine whether this friendship can be salvaged and how to address the betrayal. You'll feel satisfied when you have a clear plan for the difficult conversation and criteria for deciding whether to continue the friendship."
+        },
+        {
+          "role_description": "You found out your friend group has been having regular gatherings without inviting you for the past six months. You discovered this when photos were accidentally shared in a group chat. These are friends you've known since high school and considered your closest social circle.",
+          "emotional_traits": "Masks hurt with humor, questions own likability, hesitant to express genuine feelings, seeks explanation while being afraid of the answer",
+          "user_goal": "To understand why you've been excluded and determine whether to confront your friends or seek new social connections. You'll feel satisfied when you have confidence in how to address the situation without appearing desperate or overly emotional."
+        },
+        {
+          "role_description": "Your roommate and close friend has been taking money from your wallet without asking. You set up a camera after noticing cash missing multiple times and caught them in the act. You haven't confronted them yet and are unsure how to handle the situation.",
+          "emotional_traits": "Alternates between anger and disbelief, seeks to understand motivation, concerned about living situation, struggles with appropriate confrontation approach",
+          "user_goal": "To address the theft in a way that protects your finances while determining if the friendship and living arrangement can be salvaged. You'll feel satisfied when you have a plan for confrontation and clear boundaries for moving forward."
+        }
+      ]
     },
     "Family Conflict": {
       "topic": "Navigating ongoing family disagreement",
-      "role_description": "You are a first-generation college student whose family has made significant sacrifices for your education. Your family is pressuring you to follow their career expectations, but you want to pursue your own path. Every conversation turns into an argument, and this conflict is affecting your mental health. You're financially dependent on your family, which complicates the situation.",
-      "emotional_traits": "Torn between loyalty and independence, expresses guilt alongside frustration, seeks permission while wanting autonomy"
+      "roles": [
+        {
+          "role_description": "You are a first-generation college student whose family has made significant sacrifices for your education. Your family is pressuring you to follow their career expectations, but you want to pursue your own path. Every conversation turns into an argument, and this conflict is affecting your mental health. You're financially dependent on your family, which complicates the situation.",
+          "emotional_traits": "Torn between loyalty and independence, expresses guilt alongside frustration, seeks permission while wanting autonomy",
+          "user_goal": "To find a way to pursue your own career interests while maintaining family relationships. You'll feel satisfied when you have strategies for communicating your choices respectfully and a plan for financial independence."
+        },
+        {
+          "role_description": "You have recently come out as LGBTQ+ to your religious family, and they are having difficulty accepting your identity. Family gatherings have become tense, with some relatives refusing to speak to you while others act as if nothing has changed. You want to maintain family connections without compromising your authentic self.",
+          "emotional_traits": "Defensive of identity, hurt by rejection but understanding of adjustment period, alternates between patience and frustration, uses humor to diffuse tension",
+          "user_goal": "To navigate family relationships while staying true to your identity. You'll feel satisfied when you have boundaries that protect your well-being and strategies for engaging with family members at different stages of acceptance."
+        },
+        {
+          "role_description": "You're caught between your spouse and your parents who strongly dislike each other. Holiday planning has become a battlefield, with both sides expecting you to prioritize them. Your parents feel disrespected by your spouse, while your spouse feels your parents are intrusive. You love all parties involved and feel torn apart by the conflict.",
+          "emotional_traits": "Frequently apologizes, tries to please everyone, expresses physical symptoms of stress when discussing conflict, struggles to establish boundaries with either side",
+          "user_goal": "To reduce conflict between your spouse and parents while maintaining relationships with both. You'll feel satisfied when you have clear boundaries, communication strategies, and a fair approach to dividing time between both sides."
+        }
+      ]
+    },
+    "Family Care Decision": {
+      "topic": "Making decisions about caring for family members",
+      "roles": [
+        {
+          "role_description": "You've noticed significant behavioral changes in an elderly parent who lives alone - including forgetfulness, confusion about day/time, and declining personal hygiene. You're concerned about their safety living independently but know they highly value their autonomy and would resist moving to assisted living.",
+          "emotional_traits": "Balances practicality with emotional sensitivity, feels guilty about possible role reversal, offers concrete examples of concerning behaviors, seeks middle-ground solutions",
+          "user_goal": "To develop a plan for ensuring your parent's safety while respecting their autonomy as much as possible. You'll feel satisfied when you have specific interventions to try before suggesting assisted living and a strategy for having difficult conversations about care needs."
+        },
+        {
+          "role_description": "You have a child who's struggling academically and socially in their current school. They've been experiencing anxiety and decreased self-confidence. You're considering transferring them to a different school environment, but worry about the potential disruption and whether it will actually improve the situation.",
+          "emotional_traits": "Protective of child's emotional state, blends optimism with worry, seeks expert perspectives but trusts parental instinct, uses specific examples to illustrate concerns",
+          "user_goal": "To determine whether changing schools is the right solution for your child's academic and social challenges. You'll feel satisfied when you have a clear assessment framework, methods to gauge your child's preferences without adding pressure, and specific steps to ease any transition."
+        },
+        {
+          "role_description": "Your sibling is going through a difficult divorce and has asked to move in with you 'temporarily' with their two young children. You want to help, but you live in a small space, value your privacy, and are concerned about what 'temporary' might actually mean. You're feeling caught between family obligation and personal boundaries.",
+          "emotional_traits": "Feels guilt about hesitation to help, presents practical concerns alongside emotional ones, seeks compromise solutions, occasionally mentions past family dynamics",
+          "user_goal": "To find a way to support your sibling during their divorce while maintaining appropriate boundaries. You'll feel satisfied when you have a concrete plan with timeline expectations, house rules, and strategies for handling potential conflicts."
+        }
+      ]
     }
   },
   "Career": {
     "Job Burnout": {
       "topic": "Dealing with severe workplace burnout",
-      "role_description": "You've been working at a high-pressure company for 3 years and are experiencing severe burnout. Your team is understaffed and the company recently went through restructuring. You used to love your job but now dread each workday, feel constantly exhausted, make mistakes, and can't focus on tasks.",
-      "emotional_traits": "Describes physical exhaustion frequently, has diminished enthusiasm, becomes defensive about personal performance, occasionally expresses imposter syndrome"
+      "roles": [
+        {
+          "role_description": "You've been in your high-pressure job for three years and are experiencing severe burnout. You're constantly exhausted, have lost interest in work you once enjoyed, and are making uncharacteristic mistakes. Your performance is slipping, but you're afraid to take time off due to important deadlines and fear of career repercussions.",
+          "emotional_traits": "Feels trapped but fearful of change, defensive about productivity, frequently mentions physical exhaustion, becomes agitated when suggesting simple fixes",
+          "user_goal": "To find a way to recover from burnout without damaging your career. You'll be satisfied when you have both immediate strategies to reduce stress and a longer-term plan to create sustainable work-life balance."
+        },
+        {
+          "role_description": "You're a healthcare worker who has been working excessive hours during a public health crisis. You're experiencing severe burnout with symptoms of emotional numbness, irritability with patients, and difficulty sleeping. You feel guilty about considering a career change when your services are so needed.",
+          "emotional_traits": "Speaks clinically about own symptoms, deflects compliments about dedication, exhibits black-and-white thinking about career options, minimizes own needs",
+          "user_goal": "To find ethical ways to address your burnout while continuing to provide necessary healthcare services. You'll feel satisfied when you have both immediate self-care strategies and longer-term career options that balance your well-being with professional responsibility."
+        },
+        {
+          "role_description": "You're a small business owner who has been working 70+ hours weekly for two years straight. You're experiencing burnout but feel you can't step back because employees and customers depend on you. Your personal relationships are suffering, and you haven't taken a day off in months.",
+          "emotional_traits": "Pride in work ethic despite problems, difficulty delegating, expresses guilt about considering own needs, frames self-care as weakness",
+          "user_goal": "To create a sustainable work schedule that prevents burnout while maintaining your business. You'll feel satisfied when you have specific delegation strategies, systems to reduce your workload, and a plan for taking time off without business disruption."
+        }
+      ]
     },
     "Career Change": {
       "topic": "Contemplating major career shift",
-      "role_description": "You are 35 years old and considering a complete career change after 10 years in marketing. You feel unfulfilled and are interested in healthcare, but worried it might be too late to start over. You have financial responsibilities and your partner is supportive but concerned about the financial implications of this change.",
-      "emotional_traits": "Oscillates between excitement and doubt, frames decisions in terms of long-term fulfillment, seeks reassurance about age-related concerns"
+      "roles": [
+        {
+          "role_description": "You are 35 years old and considering a complete career change after 10 years in marketing. You feel unfulfilled and are interested in healthcare, but worried it might be too late to start over. You have financial responsibilities and your partner is supportive but concerned about the financial implications of this change.",
+          "emotional_traits": "Oscillates between excitement and doubt, frames decisions in terms of long-term fulfillment, seeks reassurance about age-related concerns",
+          "user_goal": "To determine if a career change is the right solution for your unfulfillment and what field might better align with your values. You'll feel satisfied when you have a framework for exploring new careers without immediately sacrificing your current position and steps to test potential new paths."
+        },
+        {
+          "role_description": "You're a successful finance professional with a prestigious position and high salary, but you've always dreamed of becoming a teacher. You're considering leaving your career to pursue education, but worry about the significant pay cut and status change. You're also concerned about whether your skills would transfer.",
+          "emotional_traits": "Measures decisions by social perception, uncomfortable with uncertainty, articulate about career dissatisfaction but vague about teaching aspirations, seeks permission to prioritize passion over prestige",
+          "user_goal": "To find a more intellectually fulfilling career path that also provides financial stability. You'll feel satisfied when you have clarity on education requirements for potential new fields, scholarship/financing options, and whether you can transition gradually while maintaining income."
+        },
+        {
+          "role_description": "You're a skilled tradesperson whose physical health issues are making it increasingly difficult to perform your job. You need to transition to less physically demanding work but have limited formal education. Your identity is strongly tied to your craft, which you've practiced for over 20 years.",
+          "emotional_traits": "Proud of practical skills, skeptical of formal education, concerned about starting over, expresses frustration about physical limitations",
+          "user_goal": "To find a sustainable way to continue working without sacrificing your physical health. You'll feel satisfied when you have a clear plan for transitioning to a less physically demanding role, including education or training options and a timeline for making the change."
+        }
+      ]
     },
     "Job Rejection": {
       "topic": "Coping with unexpected job rejection",
-      "role_description": "You just got rejected from what you thought was your dream job after a 2-month interview process. You were told you were their second choice. You're currently in an unfulfilling job and have been rejected from several positions in the past year. This latest rejection has left you devastated and questioning your career path.",
-      "emotional_traits": "Questions own competence, compares self to others frequently, fluctuates between determination and despair, seeks concrete explanations for rejection"
+      "roles": [
+        {
+          "role_description": "You just got rejected from what you thought was your dream job after a 2-month interview process. You were told you were their second choice. You're currently in an unfulfilling job and have been rejected from several positions in the past year. This latest rejection has left you devastated and questioning your career path.",
+          "emotional_traits": "Questions own competence, compares self to others frequently, fluctuates between determination and despair, seeks concrete explanations for rejection",
+          "user_goal": "To rebuild your confidence and develop an effective job search strategy after multiple rejections. You'll feel satisfied when you have techniques to manage rejection disappointment, a plan to strengthen your candidacy, and a renewed sense of career direction."
+        },
+        {
+          "role_description": "You were passed over for an internal promotion that everyone expected you to get. Instead, the position went to a newer employee with less experience but a friendship with upper management. You feel betrayed by the company you've been loyal to for years and are unsure whether to fight the decision, accept it, or look elsewhere.",
+          "emotional_traits": "Maintains professional tone despite anger, sensitive to perceived injustice, concerned about reputation if speaking up, analyzes organizational politics",
+          "user_goal": "To determine how to respond to perceived workplace unfairness while protecting your career prospects. You'll feel satisfied when you have strategies for addressing the situation professionally, clarity on whether to stay or leave, and ways to rebuild your motivation regardless of your decision."
+        },
+        {
+          "role_description": "You're a mid-career professional who has been job hunting for 8 months following a layoff. Despite having relevant experience and skills, you've faced consistent rejection. Your unemployment benefits are running out, and you're beginning to consider positions far below your qualification level out of financial necessity.",
+          "emotional_traits": "Presents overly positive front initially, reveals deeper anxiety when pressed, increasingly willing to compromise career goals, expresses shame about financial struggles",
+          "user_goal": "To balance immediate financial needs with long-term career aspirations during extended unemployment. You'll feel satisfied when you have a sustainable financial plan, strategies to improve your job search effectiveness, and clarity on what compromises are worth making versus which would harm your career trajectory."
+        }
+      ]
+    },
+    "Career Decision": {
+      "topic": "Making a significant career change decision",
+      "roles": [
+        {
+          "role_description": "You are trying to decide whether to leave your stable but unsatisfying job for a more exciting opportunity at a startup. Your current position offers good benefits and security, while the startup role promises more responsibility, potentially higher pay, but considerable risk. You have family financial obligations that make this decision complicated.",
+          "emotional_traits": "Risk-averse but desires growth, expresses frustration with status quo, seeks reassurance about decisions, analyzes options extensively",
+          "user_goal": "To make a decision about your career change that balances financial security with personal fulfillment. You'll feel satisfied when you have a clear framework for evaluating both opportunities and a concrete plan for whichever path you choose."
+        },
+        {
+          "role_description": "You're trying to decide whether to go back to school for an advanced degree. You've been in your career for several years but feel like you're hitting a ceiling without further education. Getting the degree would require significant time and financial investment, possibly going part-time at work or taking on debt.",
+          "emotional_traits": "Decisive in other areas but hesitant about education, calculates ROI frequently, seeks validation for ambitious plans, worries about opportunity costs",
+          "user_goal": "To determine if pursuing an advanced degree is worth the investment of time and money at this point in your career. You'll feel satisfied when you have a clear cost-benefit analysis and timeline for your educational decision."
+        },
+        {
+          "role_description": "You've been offered a job in another city that represents a significant career advancement. However, moving would mean uprooting your family, including school-age children who are well-established in their current environment. Your spouse has a good job locally but would likely take a step back career-wise with the move.",
+          "emotional_traits": "Weighs family needs against personal ambition, articulates multiple perspectives, expresses guilt about potential impacts, seeks balanced approach",
+          "user_goal": "To make a decision about the job offer that considers both your career advancement and your family's wellbeing. You'll be satisfied when you have a framework for making this decision that accounts for all family members' needs and a concrete plan for minimizing disruption if you move."
+        }
+      ]
     }
+  },
+  "Day-to-Day Technical": {
+    "Home Network Troubleshooting": {
+      "topic": "Troubleshooting home Wi-Fi connectivity issues",
+      "roles": [
+        {
+          "role_description": "Your home Wi-Fi has been increasingly unreliable, with frequent disconnections and slow speeds, especially during video calls for work. You've tried restarting the router multiple times, but issues persist. You need a stable connection for an important presentation tomorrow and aren't technically savvy.",
+          "emotional_traits": "Expresses frustration with technical jargon, becomes impatient with multi-step solutions, shows relief when given clear explanations, concerned about costs of fixes",
+          "user_goal": "To get reliable Wi-Fi working before your important work presentation tomorrow. You'll feel satisfied when you have a straightforward solution you can implement yourself without technical expertise."
+        },
+        {
+          "role_description": "You are experiencing intermittent Wi-Fi connectivity issues at home that affect your work video calls. You've tried restarting your router multiple times but the problem persists. You have limited technical knowledge but need to resolve this quickly as you have important meetings tomorrow.",
+          "emotional_traits": "Frustrated with technology, anxious about work impact, willing to try solutions if explained clearly, tends to skip steps if instructions are too complex",
+          "user_goal": "To resolve your Wi-Fi issues before your important work meetings. You'll feel satisfied when you have step-by-step troubleshooting instructions that you can follow without technical expertise."
+        },
+        {
+          "role_description": "You're a senior citizen who relies on internet connection to video chat with grandchildren and access telehealth services. Your Wi-Fi has become unreliable lately, and you're not sure what's causing it. You have basic computer skills but find networking terminology confusing.",
+          "emotional_traits": "Patient but easily overwhelmed by technical terms, takes detailed notes, expresses concerns about being taken advantage of by service providers, appreciates analogies to familiar concepts",
+          "user_goal": "To get reliable internet working consistently for your video calls with family and telemedicine appointments. You'll feel satisfied when you have simple, non-technical instructions to fix common issues and clarity on when professional help is actually needed."
+        }
+      ]
+    },
+    "Software Selection": {
+      "topic": "Selecting appropriate software for business needs",
+      "roles": [
+        {
+          "role_description": "You run a small retail business and need to select project management software to coordinate your team of 5 people. You have basic technical skills, a limited budget, and need something user-friendly that will help with inventory management, task assignment, and basic customer tracking.",
+          "emotional_traits": "Practical decision-maker, somewhat overwhelmed by options, prioritizes value for money, concerned about implementation learning curve",
+          "user_goal": "To find the most suitable project management software for your small business needs. You'll feel satisfied when you have 2-3 specific recommendations with clear explanations of how each option addresses your inventory, task management, and customer tracking requirements within your budget."
+        },
+        {
+          "role_description": "You're a freelance graphic designer looking for software to manage client projects, track time, generate invoices, and organize portfolios. You're not very tech-savvy beyond your design programs and have had negative experiences with overcomplicated software in the past.",
+          "emotional_traits": "Visually oriented, becomes impatient with text-heavy explanations, concerned about software aesthetics, values intuitive interfaces over extensive features",
+          "user_goal": "To find user-friendly software that streamlines your freelance business operations. You'll feel satisfied when you have recommendations for intuitive tools that handle project management, time tracking, invoicing, and portfolio organization without a steep learning curve."
+        },
+        {
+          "role_description": "You're starting a podcast and need to select recording, editing, and distribution software. You're enthusiastic but completely new to audio production and have a very limited budget. You're overwhelmed by the technical terminology in the reviews you've read so far.",
+          "emotional_traits": "Eager to learn but easily discouraged by complexity, excited about creative possibilities, concerned about making wrong investments, appreciates step-by-step guidance",
+          "user_goal": "To find beginner-friendly, affordable podcast production software. You'll feel satisfied when you understand the essential tools needed for recording, editing, and distribution, with specific recommendations that balance functionality with ease of use for a complete novice."
+        }
+      ]
+    },
+    "Smartphone Issues": {
+      "topic": "Resolving smartphone battery drain and performance issues",
+      "roles": [
+        {
+          "role_description": "Your smartphone has recently started draining its battery extremely quickly and occasionally freezing during use. It's only 18 months old, and you rely on it heavily for work and personal use throughout the day.",
+          "emotional_traits": "Annoyed at unexpected problems, concerned about potential costs, willing to try troubleshooting before replacement, values device reliability",
+          "user_goal": "To extend your smartphone's battery life and resolve performance issues without replacing the device. You'll feel satisfied when you have implemented effective solutions that noticeably improve battery duration and eliminate freezing problems."
+        },
+        {
+          "role_description": "You are a parent whose child's smartphone is having severe battery and performance issues. The phone was expensive and is relatively new, but your child uses it constantly for games and videos. You're trying to determine if the problems are due to usage patterns or a device defect.",
+          "emotional_traits": "Frustrated with child's device dependence, skeptical about whether problem is user-caused, concerned about spending money on replacement, wants to use situation as teaching moment",
+          "user_goal": "To determine whether your child's phone problems are usage-related or due to a defect. You'll feel satisfied when you have clear diagnostic information, practical solutions to try, and guidance on discussing responsible device usage with your child."
+        },
+        {
+          "role_description": "You rely on your smartphone for a side-gig as a rideshare driver, but it's suddenly experiencing severe battery drain and lags when running navigation apps. You can't afford downtime or an immediate replacement, as this income supplements your primary job.",
+          "emotional_traits": "Urgent problem-solving approach, calculates costs in terms of lost income, willing to try technical solutions, prioritizes quick fixes over optimal long-term solutions",
+          "user_goal": "To immediately resolve your phone issues so you can continue your rideshare work without interruption. You'll feel satisfied when you have implemented quick, effective solutions that make your phone reliable enough for navigation apps during your driving shifts."
+        }
+      ]
+    },
+    "Tech Support": {
+      "topic": "Resolving various tech support issues",
+      "roles": [
+        {
+          "role_description": "You're having problems with your smartphone battery draining extremely quickly after only having the device for less than a year. You've tried closing apps and reducing screen brightness, but the battery still depletes within a few hours. You rely on your phone for work and personal use throughout the day.",
+          "emotional_traits": "Expresses frustration with technical jargon, becomes impatient with multi-step solutions, shows relief when given clear explanations, concerned about costs of fixes",
+          "user_goal": "To get reliable battery life for your phone without having to purchase a new device. You'll feel satisfied when you have both immediate battery-saving techniques and knowledge about whether a battery replacement would solve the issue."
+        },
+        {
+          "role_description": "Your laptop has suddenly become very slow, taking minutes to open basic programs and frequently freezing. It's a 3-year-old machine that you need for work and personal projects. You're trying to determine whether you need to replace it or if there are ways to improve its performance.",
+          "emotional_traits": "Describes technical issues with everyday analogies, shows attachment to current device, concerned about data loss, expresses anxiety about making significant purchases",
+          "user_goal": "To restore your laptop's performance to an acceptable level within a reasonable budget. You'll feel satisfied when you understand the specific causes of slowness, have tried performance optimization steps, and have clear criteria for deciding when replacement is necessary."
+        },
+        {
+          "role_description": "Your printer worked fine until recently, but now it refuses to print or shows error messages you don't understand. You've checked cables and restarted everything multiple times. You need to print important documents soon and are considering whether to troubleshoot further or simply buy a new printer.",
+          "emotional_traits": "Expresses disproportionate frustration typical with printer issues, mistrusts printer companies, willing to try step-by-step fixes, becomes impatient with complex solutions",
+          "user_goal": "To get your printer working properly again as soon as possible. You'll feel satisfied when you have a systematic troubleshooting approach and clarity on whether repair or replacement is more cost-effective."
+        }
+      ]
+    }
+  },
+  "Day-to-Day Creative": {
+    "Home Renovation": {
+      "topic": "Planning a budget-friendly kitchen renovation",
+      "roles": [
+        {
+          "role_description": "You're planning to renovate your kitchen on a moderate budget. You want to update the look without a complete remodel, focusing on paint, cabinet refinishing, and perhaps new countertops. You have basic DIY skills but are unsure about which projects to tackle yourself versus hiring professionals.",
+          "emotional_traits": "Excited about transformation, somewhat anxious about costs and disruption, tends to underestimate project complexity, visual thinker",
+          "user_goal": "To create a plan for a cost-effective kitchen update that balances DIY and professional work. You'll feel satisfied when you have clear guidance on which projects are realistically within your skill level and a prioritized list of improvements that will give the best visual impact for your budget."
+        },
+        {
+          "role_description": "You're a first-time homeowner who bought a house with an outdated kitchen. You're eager to renovate but have limited funds after the home purchase and no previous DIY experience. You're feeling overwhelmed by the number of decisions and potential costs.",
+          "emotional_traits": "Enthusiastic but naive about renovation realities, drawn to aesthetic trends without considering practicality, anxious about making permanent choices, learns best through visual examples",
+          "user_goal": "To develop a realistic renovation plan that works with your limited budget and DIY inexperience. You'll feel satisfied when you have a phased approach to kitchen improvements, starting with high-impact, low-cost changes and clear guidance on avoiding common first-time renovator mistakes."
+        },
+        {
+          "role_description": "You've attempted a kitchen renovation DIY project and are now struggling halfway through. You've removed cabinet doors and started painting, but the results don't look professional. You're considering whether to continue, hire help, or try to restore the kitchen to its original state.",
+          "emotional_traits": "Embarrassed about current kitchen state, defensive about decisions made so far, discouraged by gap between vision and reality, reluctant to spend money after initial investment",
+          "user_goal": "To salvage your kitchen renovation project with minimal additional expense. You'll feel satisfied when you have practical advice for fixing specific issues with your current work and a realistic assessment of which parts of the project you should complete yourself versus hiring help."
+        }
+      ]
+    },
+    "Gift Ideas": {
+      "topic": "Finding a meaningful gift for a special occasion",
+      "roles": [
+        {
+          "role_description": "You need to find a birthday gift for your best friend of 15 years. They're turning 30, and you want something especially meaningful. They seem to have everything they need, and you've already given many personal gifts over the years. Your budget is around $100, and the birthday is in two weeks.",
+          "emotional_traits": "Feels pressure to find 'perfect' gift, reminisces about friendship history, expresses self-doubt about gift-giving ability, shows appreciation for creative ideas",
+          "user_goal": "To find a unique, meaningful gift that suits your friend's personality and your long history together. You'll be satisfied when you have 2-3 specific gift ideas that feel personal and special within your budget."
+        },
+        {
+          "role_description": "You need to find a meaningful birthday gift for your partner of two years who has recently become interested in cooking and outdoor activities. You want something thoughtful that aligns with their interests but isn't overly expensive. Previous gifts have included books and concert tickets.",
+          "emotional_traits": "Wants to make a good impression, slightly anxious about gift appropriateness, remembers details about recipient's preferences, values thoughtfulness over monetary value",
+          "user_goal": "To find a special, personalized gift that shows you understand your partner's interests in cooking and outdoor activities. You'll be satisfied when you have 2-3 specific gift ideas that balance thoughtfulness with a reasonable price point."
+        },
+        {
+          "role_description": "You're in a new relationship (3 months) and need to find an appropriate gift for your partner's upcoming birthday. You want something that shows you care without seeming too intense or presumptuous given the relationship stage. They've mentioned liking music, films, and hiking.",
+          "emotional_traits": "Overthinks social implications of gift choices, concerned about coming on too strong, asks for reassurance about appropriateness, notices and remembers specific mentions of likes/dislikes",
+          "user_goal": "To find a gift that demonstrates interest without implying excessive commitment at this early relationship stage. You'll feel satisfied when you have gift ideas that feel casual yet thoughtful and appropriate for the 3-month relationship milestone."
+        }
+      ]
+    },
+    "Creative Block": {
+      "topic": "Overcoming writer's block on a creative project",
+      "roles": [
+        {
+          "role_description": "You're a writer working on a personal project who has hit a creative block. You were making good progress on your novel for several months but haven't been able to write productively for the past two weeks. You have a deadline you've set for yourself and are becoming increasingly frustrated and anxious about your lack of progress.",
+          "emotional_traits": "Self-critical, tends to catastrophize creative struggles, compares current block to past productive periods, alternates between wanting to push through and wanting to abandon project",
+          "user_goal": "To overcome your writer's block and resume productive work on your novel. You'll feel satisfied when you have practical techniques to restart your creative flow and a sustainable writing plan to meet your self-imposed deadline."
+        },
+        {
+          "role_description": "You're a student working on a creative thesis project that's due in one month. After initial enthusiasm, you've hit a creative wall and are struggling to make progress. You're concerned about your grade and about disappointing your advisor who has been supportive of your concept.",
+          "emotional_traits": "Perfectionist tendencies, expresses anxiety through physical complaints, seeks external validation, frequently mentions time pressure",
+          "user_goal": "To break through your creative block and make substantial progress on your thesis within a tight timeframe. You'll feel satisfied when you have specific strategies to overcome perfectionism, a structured plan to meet your deadline, and approaches for communicating with your advisor about your progress."
+        },
+        {
+          "role_description": "You're a hobby painter who usually finds joy and relaxation in your art. Recently, you've lost motivation and find yourself staring at blank canvases. You've tried your usual subjects and techniques but feel uninspired and critical of everything you attempt.",
+          "emotional_traits": "Questions purpose of creative pursuits, dismissive of own past work, compares self to others, seeks spark of inspiration rather than discipline-based approaches",
+          "user_goal": "To rediscover joy and inspiration in your painting practice. You'll feel satisfied when you have novel approaches to try, techniques for overcoming self-criticism, and a renewed sense of purpose in your creative hobby."
+        }
+      ]
+    }
+  },
+  "Housing Decision": {
+    "topic": "Making decisions about housing and real estate",
+    "roles": [
+      {
+        "role_description": "You want to buy your first home but are uncertain if now is the right time. Housing prices in your area are high, and you're concerned about interest rates and potential economic instability. You have a stable job and have saved enough for a down payment, but it would deplete most of your savings.",
+        "emotional_traits": "Excited but risk-aware, expresses FOMO (fear of missing out) about rising prices, seeks mathematical validation, imagines both positive and negative future scenarios",
+        "user_goal": "To determine if you should proceed with buying a home now or continue renting and saving. You'll feel satisfied when you have a clear financial analysis of both options and specific markers that would indicate when the time is right to buy."
+      },
+      {
+        "role_description": "You're considering moving from a high-cost urban area to a more affordable suburban or rural location. While you'd save significantly on housing costs, you're concerned about potential lifestyle changes, community fit, and career opportunities. The pandemic has made remote work more feasible but not guaranteed long-term.",
+        "emotional_traits": "Romanticizes aspects of both urban and rural life, quantifies financial benefits precisely, seeks social validation for major life changes, shows anxiety about 'making the wrong choice'",
+        "user_goal": "To decide whether relocating from the city would improve your overall quality of life. You'll feel satisfied when you have a framework for evaluating both tangible factors (housing costs, commute) and intangible factors (community, lifestyle) to make a confident decision."
+      }
+    ]
+  },
+  "Financial Planning": {
+    "topic": "Making financial planning decisions",
+    "roles": [
+      {
+        "role_description": "You recently inherited a significant sum of money from a relative and are unsure how to manage it wisely. You have some debt, no investment experience, and are concerned about making poor decisions. You're considering various options including paying off debt, investing, buying property, or simply keeping it in savings.",
+        "emotional_traits": "Careful with financial decisions, expresses both opportunity and anxiety, occasionally mentions relative who left the money, seeks educational approach",
+        "user_goal": "To develop a comprehensive plan for your inheritance that balances immediate needs with long-term financial security. You'll feel satisfied when you have a prioritized action plan and knowledge about different investment options suitable for your risk tolerance."
+      },
+      {
+        "role_description": "You've accumulated significant credit card debt across multiple cards and are finding it increasingly difficult to make minimum payments. You have a steady income but between rent, car payments, and other expenses, you're barely staying afloat. You're feeling overwhelmed and unsure how to address the growing debt.",
+        "emotional_traits": "Shows shame around financial situation, avoids detailed numbers initially, expresses determination to improve, becomes more open with encouragement",
+        "user_goal": "To create a realistic debt repayment plan that fits within your current income constraints. You'll feel satisfied when you have specific strategies for reducing interest rates, prioritizing which debts to pay first, and a monthly budget that allows for gradual debt reduction."
+      },
+      {
+        "role_description": "You're a new parent planning for your child's future education. You want to start saving early but are confused by the various college savings plans, investment options, and projections about future education costs. You're trying to balance education savings with other financial priorities like retirement.",
+        "emotional_traits": "Forward-thinking, methodical in approach, expresses desire to maximize opportunities for child, seeks to understand complex options simply",
+        "user_goal": "To establish an effective college savings plan for your child while maintaining your own financial stability. You'll feel satisfied when you understand the differences between savings options, have a target monthly contribution amount, and know how to balance education savings with other financial goals."
+      }
+    ]
+  },
+  "Writing Assistance": {
+    "topic": "Getting help with writing tasks",
+    "roles": [
+      {
+        "role_description": "You're working on an important email to your entire organization about upcoming changes. You want it to sound professional but empathetic, as some of the changes may be difficult for employees. You're struggling with the tone and clarity of your message.",
+        "emotional_traits": "Concerned about how message will be received, detail-oriented, values clear communication, anxious about potential misinterpretations",
+        "user_goal": "To draft a clear, professional email that effectively communicates organizational changes while showing empathy for employees. You'll feel satisfied when you have a well-structured message that balances directness about the changes with sensitivity to how they'll affect staff."
+      },
+      {
+        "role_description": "You're writing your first resume after graduating from college and feel overwhelmed by conflicting advice online. You have limited work experience but several relevant academic projects and volunteer positions. You're unsure how to present yourself effectively to potential employers.",
+        "emotional_traits": "Uncertain about own qualifications, perfectionist tendencies, compares self to peers, eager to make good impression",
+        "user_goal": "To create a resume that effectively showcases your strengths despite limited work experience. You'll feel satisfied when you have a professional resume structure with clear guidance on how to highlight academic projects and volunteer work in a way that appeals to employers."
+      },
+      {
+        "role_description": "You're trying to write a best man speech for your brother's wedding next month. You want it to be funny but appropriate, personal but not embarrassing, and meaningful without being overly sentimental. You've started several drafts but aren't happy with any of them.",
+        "emotional_traits": "Wants to honor important relationship, anxious about public speaking, uses humor to deflect emotions, concerned about audience reception",
+        "user_goal": "To craft a memorable best man speech that strikes the right balance of humor, sincerity, and appropriateness. You'll feel satisfied when you have a well-structured speech with personal anecdotes that reflect your relationship with your brother without crossing into inappropriate territory."
+      }
+    ]
+  },
+  "Idea Discussion": {
+    "topic": "Exploring and refining ideas",
+    "roles": [
+      {
+        "role_description": "You're a teacher planning a new interdisciplinary project for your middle school students. You want to combine elements of science, history, and art, but are struggling to find a unifying theme that will engage students and satisfy curriculum requirements.",
+        "emotional_traits": "Enthusiastic about innovative teaching, practical about implementation challenges, values student engagement, wants tangible outcomes",
+        "user_goal": "To develop a cohesive interdisciplinary project plan that excites students while meeting curriculum standards. You'll feel satisfied when you have a clear project theme, specific activities for each subject area, and assessment criteria that measure learning across disciplines."
+      },
+      {
+        "role_description": "You're brainstorming business ideas for a side hustle that could eventually become your full-time job. You have skills in graphic design and social media management but aren't sure what specific service or product would be viable in your local market.",
+        "emotional_traits": "Dreams of entrepreneurship, cautious about financial risk, compares ideas to existing businesses, seeks validation of concepts",
+        "user_goal": "To identify a viable business concept that leverages your skills and has potential in your market. You'll feel satisfied when you have narrowed down to 1-2 specific business ideas with clear service offerings, target customer profiles, and initial steps for market testing."
+      },
+      {
+        "role_description": "You're planning a significant home renovation project but have a limited budget. You need to prioritize which improvements will add the most value to your home while also enhancing your quality of life. You have many ideas but aren't sure which are most practical.",
+        "emotional_traits": "Excited about transformation possibilities, concerned about costs, values both aesthetics and functionality, wants to avoid regrets",
+        "user_goal": "To create a prioritized renovation plan that maximizes value within your budget constraints. You'll feel satisfied when you have a clear list of improvements ranked by importance, cost estimates for each, and a phased approach to completing the work over time."
+      }
+    ]
+  },
+  "Daily Life Questions": {
+    "topic": "Advice for everyday situations and decisions",
+    "roles": [
+      {
+        "role_description": "You've recently moved to a new city and are having trouble establishing a social circle. You're naturally introverted and work remotely, which limits your natural opportunities to meet people. You're looking for strategies to build meaningful connections in your new location.",
+        "emotional_traits": "Lonely but anxious about putting yourself out there, selective about friendships, values deeper connections over many acquaintances, fatigued by forced socializing",
+        "user_goal": "To develop practical strategies for building a social network as an introvert in a new city. You'll feel satisfied when you have specific approaches for meeting people that align with your personality, interests, and energy levels."
+      },
+      {
+        "role_description": "You're trying to establish a regular exercise routine after years of being sedentary. Previous attempts at getting fit have failed because you quickly lose motivation or get discouraged. You're looking for an approach that will be sustainable given your busy schedule and low initial fitness level.",
+        "emotional_traits": "Embarrassed about current fitness, easily discouraged by slow progress, compares self to others, fluctuates between high motivation and complete avoidance",
+        "user_goal": "To create a sustainable exercise plan that accommodates your current fitness level and schedule. You'll feel satisfied when you have a realistic routine with specific activities, measurable progress markers, and strategies to maintain motivation during difficult periods."
+      },
+      {
+        "role_description": "You're planning meals for the upcoming week and want to incorporate more plant-based options for health and environmental reasons. However, you have picky eaters in your household and limited cooking experience with vegetarian cuisine. You need practical ideas that will satisfy everyone.",
+        "emotional_traits": "Determined to make positive changes, frustrated by family resistance, practical about time constraints, values compromise over perfection",
+        "user_goal": "To develop a meal plan that increases plant-based options while still appealing to your family. You'll feel satisfied when you have specific recipes to try, shopping lists for ingredients, and strategies for introducing new foods in a way that minimizes resistance."
+      }
+    ]
+  },
+  "Work Productivity": {
+    "topic": "Improving efficiency and effectiveness at work",
+    "roles": [
+      {
+        "role_description": "You've recently been promoted to team leader and are struggling to balance your own work tasks with new management responsibilities. You feel constantly behind and are working long hours to compensate. You need to find a better system for prioritization and delegation.",
+        "emotional_traits": "Conscientious about performance, reluctant to burden team members, values thoroughness, anxious about being judged as incompetent",
+        "user_goal": "To develop effective time management and delegation strategies for your new leadership role. You'll feel satisfied when you have a clear framework for prioritizing tasks, specific techniques for delegating appropriately, and a sustainable work schedule that doesn't require constant overtime."
+      },
+      {
+        "role_description": "You work in a busy open office environment and find it increasingly difficult to focus on deep work with constant interruptions. You can't change your physical workspace, and you have collaborative responsibilities that prevent you from being completely unavailable. You need strategies to protect your focus while remaining accessible.",
+        "emotional_traits": "Frustrated by productivity barriers, concerned about seeming unfriendly, values quality work, experiences mental fatigue from context-switching",
+        "user_goal": "To create a system for managing interruptions while maintaining focus in your open office. You'll feel satisfied when you have practical techniques for signaling availability, scheduling focused work time, and efficiently handling necessary interruptions."
+      },
+      {
+        "role_description": "You're overwhelmed by email and digital communications across multiple platforms at work. Important information gets lost, you miss deadlines because requests are buried, and you spend hours each day just trying to stay on top of messages. You need a more efficient system for information management.",
+        "emotional_traits": "Anxious about missing critical information, overwhelmed by volume, perfectionistic about responsiveness, frustrated by time wasted",
+        "user_goal": "To establish an effective system for managing your digital communications at work. You'll feel satisfied when you have a reliable method for prioritizing messages, standard practices for different communication channels, and strategies for reducing overall communication volume."
+      }
+    ]
   }
 }
