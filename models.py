@@ -3,6 +3,7 @@ import os
 from threading import Thread
 from pathlib import Path
 import copy
+import json
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -10,7 +11,7 @@ from llama_cpp import Llama
 from huggingface_hub import login, logging, hf_hub_download, snapshot_download
 logging.set_verbosity_error()
 import tiktoken
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification, pipeline, logging, BitsAndBytesConfig, AsyncTextIteratorStreamer
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline, logging, BitsAndBytesConfig, AsyncTextIteratorStreamer, Gemma3ForCausalLM
 import torch
 logging.set_verbosity_error()
 
@@ -23,14 +24,13 @@ class LLM:
 
     def __init__(self, model_name, default_prompt=None, model_params=None, gen_params=None) -> None:
         
-        login(token=os.getenv("HF_API_KEY"), new_session=False)
+        # login(token=os.getenv("HF_API_KEY"), new_session=False)
         self.cfg = LLM.get_cfg()[model_name]
         self.model_name = model_name
         self.family = model_name.split("-")[0]
         self.repo_id = self.cfg.get("repo_id")
         self.file_name = self.cfg.get("file_name", None)
         self.context_length = int(self.cfg.get("context_length"))
-        self.finetune_path = os.path.join("finetune", self.repo_id.split("/")[-1])
         self.provider = self.get_provider()
         self.tokenizer = self.init_tokenizer()
         self.model_params = self.get_model_params(model_params)
@@ -51,8 +51,6 @@ class LLM:
             return "GROQ"
         elif self.model_name.endswith("GGUF"):
             return "GGUF"
-        elif self.model_name.endswith("FINETUNED"):
-            return "FINETUNED"
         elif self.cfg.get("provider"):
             return self.cfg.get("provider")  
         else:
@@ -169,104 +167,6 @@ class LLM:
                 len_files = len(os.listdir(model_path))
                 model_path = f"{model_path}/{self.file_name}-00001-of-0000{len_files}.gguf"
             return Llama(model_path=model_path, **self.model_params)
-        elif self.provider == "FINETUNED":
-            final_path = os.path.join(self.finetune_path, "final_model")
-            if os.path.exists(final_path):
-                # Check if this is a LLaMA model
-                if "LLAMA" in self.model_name:                    
-                    model_size_str = self.model_name.split("-")[-2]  # Get size part (e.g., "3B" from "LLAMA-3B-FINETUNED")
-                    is_large_model = False
-                    if model_size_str.endswith("B"):
-                        try:
-                            model_size = float(model_size_str[:-1])
-                            is_large_model = model_size > 1.0
-                            print(f"Model size: {model_size}B, Using quantization: {is_large_model}")
-                        except ValueError:
-                            # If we can't parse the size, assume it's not a large model
-                            pass
-                    
-                    # Check if this is a LoRA adapter by looking for adapter_config.json
-                    adapter_config_path = os.path.join(final_path, "adapter_config.json")
-                    is_lora_adapter = os.path.exists(adapter_config_path)
-                    
-                    if is_lora_adapter:
-                        print(f"Detected LoRA adapter at {adapter_config_path}")
-
-                        if is_large_model and torch.cuda.is_available():
-                            quantization_config = BitsAndBytesConfig(
-                                load_in_4bit=True,
-                                bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-                                bnb_4bit_use_double_quant=True,
-                                bnb_4bit_quant_type="nf4",
-                            )
-                            
-                            base_model = AutoModelForSequenceClassification.from_pretrained(
-                                self.repo_id,
-                                num_labels=7,
-                                quantization_config=quantization_config,
-                                device_map="auto",
-                                torch_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-                            )
-                        else:
-                            base_model = AutoModelForSequenceClassification.from_pretrained(
-                                self.repo_id,
-                                num_labels=7,
-                                **self.model_params
-                            )
-                        
-                        model = PeftModel.from_pretrained(
-                            base_model,
-                            final_path,
-                            is_trainable=False 
-                        )
-                    else:
-                        # For regular fine-tuned models (not LoRA adapters)
-                        if is_large_model and torch.cuda.is_available():
-                            # For larger models, check if we need to load with quantization
-                            quantization_config = BitsAndBytesConfig(
-                                load_in_4bit=True,
-                                bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-                                bnb_4bit_use_double_quant=True,
-                                bnb_4bit_quant_type="nf4",
-                            )
-                            
-                            model = AutoModelForSequenceClassification.from_pretrained(
-                                final_path, 
-                                **self.model_params,
-                                quantization_config=quantization_config,
-                                device_map="auto",
-                                torch_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-                            )
-                        else:
-                            # For smaller models, load normally
-                            model = AutoModelForSequenceClassification.from_pretrained(
-                                final_path, 
-                                **self.model_params,
-                                torch_dtype=torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float32,
-                                low_cpu_mem_usage=True
-                            )
-                else:
-                    model = AutoModelForSequenceClassification.from_pretrained(final_path, **self.model_params)
-            else:
-                print("Couldn't find the finetuned model, initializing with the original model")
-                # Special handling for LLaMA models for classification
-                if "LLAMA" in self.model_name:
-                    print(f"Initializing LLaMA model for classification: {self.repo_id}")
-                    # For LLaMA, we'll use AutoModelForSequenceClassification directly
-                    model = AutoModelForSequenceClassification.from_pretrained(
-                        self.repo_id,
-                        **self.model_params,
-                        torch_dtype=torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float32,
-                        low_cpu_mem_usage=True
-                    )
-                else:
-                    model = AutoModelForSequenceClassification.from_pretrained(self.repo_id, **self.model_params)
-            
-            if model is not None:
-                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-                model.to(device)
-                model.eval()
-            return model
         else: 
             bnb_config = None
             if "quantization" in self.model_params:
@@ -275,16 +175,21 @@ class LLM:
                     bnb_config = BitsAndBytesConfig(**quant_params)
                 elif isinstance(quant_params, BitsAndBytesConfig):
                     bnb_config = quant_params
-            return AutoModelForCausalLM.from_pretrained(
+            
+            if "gemma-3" in self.repo_id:
+                return Gemma3ForCausalLM.from_pretrained(
+                    self.repo_id,
+                    **self.model_params,
+                    quantization_config=bnb_config,
+                    low_cpu_mem_usage=True)
+            else:
+                return AutoModelForCausalLM.from_pretrained(
                     self.repo_id,
                     **self.model_params,
                     quantization_config=bnb_config,
                     low_cpu_mem_usage=True)
 
     def format_prompt(self, prompt, params=None):
-        if self.provider == "FINETUNED":
-            return params.get("text", "")
-
         if not prompt:
             prompt = copy.deepcopy(self.default_prompt)
         else:
@@ -332,7 +237,22 @@ class LLM:
         else:
             return len(self.tokenizer(prompt_text).input_ids)
 
-    def generate(self, prompt=None, stream=False, gen_params=None, prompt_params=None):
+    @staticmethod
+    def parse_json(output):
+        try:
+            idx = output.find("{")
+            if idx != 0:
+                output = output[idx:]
+                if output.endswith("```"):
+                    output = output[:-3]
+            output = json.loads(output, strict=False)
+        except Exception as e:
+            print(output)
+            print(e)
+
+        return output
+
+    def generate(self, prompt=None, stream=False, gen_params=None, prompt_params=None, json_output=False):
 
         if prompt_params is None:
             prompt_params = {}
@@ -407,19 +327,6 @@ class LLM:
             )
             output = response.text 
 
-        elif self.provider == "FINETUNED" and "instruct" not in self.repo_id:
-            text = prompt_params.get("text", "")
-            inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-            device = next(self.model.parameters()).device
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-            
-            with torch.no_grad():
-                outputs = self.model(**inputs)
-                probs = outputs.logits.softmax(dim=-1)
-                predicted_class = probs.argmax(dim=-1).item()
-                
-                output = predicted_class
-
         else:
             if self.family in ["MISTRAL", "GEMMA"]:
                 if len(prompt) > 1:
@@ -430,18 +337,40 @@ class LLM:
             else:
                 if stream:
                     return self.stream_hf_output(prompt, gen_params)
-                pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, **gen_params)
-                output = pipe(prompt)[0]["generated_text"][-1]["content"]
+                try:
+                    pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, **gen_params)
+                    output = pipe(prompt)[0]["generated_text"][-1]["content"]
+                except NotImplementedError as e:
+                    if "Cannot copy out of meta tensor" in str(e):
+                        # Handle meta tensor issue by using to_empty() first
+                        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                        self.model = self.model.to_empty(device=device)
+                        pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, **gen_params)
+                        output = pipe(prompt)[0]["generated_text"][-1]["content"]
+                    else:
+                        raise e
 
+        if json_output:
+            output = self.parse_json(output)
         return output
     
     async def stream_hf_output(self, prompt, gen_params):
 
         streamer = AsyncTextIteratorStreamer(self.tokenizer, skip_prompt=True)
 
-        pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, streamer=streamer, **gen_params)
-        thread = Thread(target=pipe, args=(prompt,))
-        thread.start()
+        try:
+            pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, streamer=streamer, **gen_params)
+            thread = Thread(target=pipe, args=(prompt,))
+            thread.start()
+        except NotImplementedError as e:
+            if "Cannot copy out of meta tensor" in str(e):
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                self.model = self.model.to_empty(device=device)
+                pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, streamer=streamer, **gen_params)
+                thread = Thread(target=pipe, args=(prompt,))
+                thread.start()
+            else:
+                raise e
 
         async for token in streamer:
             if token in ["<end_of_turn>", "<eot>", "<eos>", "<|eot_id|>", "<｜end▁of▁sentence｜>"]:

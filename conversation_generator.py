@@ -1,8 +1,3 @@
-"""
-Simplified role-based conversation generator that focuses on realistic human-like
-interactions without complex emotional metrics or analysis.
-"""
-
 import json
 import random
 import os
@@ -11,17 +6,15 @@ from models import LLM
 from user_reflection import get_adaptive_user_message
 
 class RoleBasedConversationGenerator:
-    def __init__(self, llm_models=["GPT-4o", "CLAUDE-3.7-SONNET"], reasoning_model="GEMMA-3-12B"):
+    def __init__(self, llm_models=["GPT-4o", "CLAUDE-3.7-SONNET", "DEEPSEEK-R1"]):
         """
         Initialize the conversation generator.
         
         Args:
             llm_models: List of LLM models to use for generation
-            reasoning_model: Model to use for user reflections
         """
-        self.llm_models = llm_models
-        self.primary_llm = llm_models[0] if llm_models else "GPT-4o"
-        self.reasoning_model = reasoning_model
+        self.user_llm = random.choice(llm_models)
+        self.chatbot_llm = random.choice(llm_models)
         
         # Load scenarios from simplified scenarios file
         self.scenarios = self._load_scenarios()
@@ -158,12 +151,24 @@ The message should:
 Additionally, please follow these specific conversation style guidelines:
 {style_instructions}
 
+        Before providing your final answer, please think through the reasoning process and provide your answer in markdown format with two sections: 'Reasoning' and 'Message'. The format should be as follows:
+        
+        ```
+        ## Reasoning
+        <your internal reasoning here>
+        ## Message
+        <your opening message here>
+        ```
+        
+        Do not include any text outside of this markdown format
+
 Opening message:"""
         
-        llm = LLM(self.primary_llm)
-        initial_message = llm.generate(prompt).strip()
+        llm = LLM(self.user_llm, gen_params={"temperature": 0.7, "max_new_tokens": 1024})
+        output_markdown = llm.generate(prompt)
+        initial_message, initial_reasoning = self.parse_markdown(output_markdown)
         
-        return initial_message
+        return initial_message, initial_reasoning
     
     def _construct_chatbot_prompt(self, role_description, conversation_history, chatbot_type, chatbot_traits):
         """
@@ -195,9 +200,19 @@ CONVERSATION HISTORY:
 
 Respond to the user's most recent message.
 
+Before providing your final answer, please think through the reasoning process and provide your answer in markdown format with two sections: 'Reasoning' and 'Message'. The format should be as follows:
+
+```
+## Reasoning
+<your internal reasoning here>
+## Message
+<your final answer here>
+```
+
+Do not include any text outside of this markdown format
+
 AI response:"""
         else:
-            # For other chatbot types, include traits
             traits_str = ""
             for trait in chatbot_traits:
                 traits_str += f"- {trait}\n"
@@ -214,6 +229,17 @@ CONVERSATION HISTORY:
 {formatted_history}
 
 Respond to the user's most recent message while maintaining your persona traits.
+
+Before providing your final answer, please think through the reasoning process and provide your answer in markdown format with two sections: 'Reasoning' and 'Message'. The format should be as follows:
+
+```
+## Reasoning
+<your internal reasoning here>
+## Message
+<your final answer here>
+```
+
+Do not include any text outside of this markdown format
 
 AI response:"""
         
@@ -233,10 +259,12 @@ AI response:"""
             Generated response as a string
         """
         prompt = self._construct_chatbot_prompt(role_description, conversation_history, chatbot_type, chatbot_traits)
-        llm = LLM(self.primary_llm)
-        response = llm.generate(prompt)
+        # Append instruction for reasoning and markdown format
+        llm = LLM(self.chatbot_llm, gen_params={"temperature": 0.7, "max_new_tokens": 1024})
+        output_markdown = llm.generate(prompt)
+        chatbot_message, chatbot_reasoning = self.parse_markdown(output_markdown)
         
-        return response
+        return chatbot_message, chatbot_reasoning
     
     def generate_conversation(self, scenario_data, min_turns=3, max_turns=7, output_file=None, conversation_index=None, existing_data=None):
         """
@@ -268,12 +296,13 @@ AI response:"""
         
         # Initialize conversation
         conversation = []
-        reflections = []
+        user_reflections = []
+        chatbot_reflections = []
         
         # Create model information
         model_info = {
-            "reasoning_model": self.reasoning_model,
-            "chatbot_model": self.primary_llm,
+            "user_llm": self.user_llm,
+            "chatbot_llm": self.chatbot_llm,
         }
         
         # Create result object
@@ -290,25 +319,29 @@ AI response:"""
             },
             "model_info": model_info,
             "conversation": conversation,
-            "reflections": reflections,
+            "user_reflections": user_reflections,
+            "chatbot_reflections": chatbot_reflections,
             "ending_reason": "In Progress",
             "turns": 0
         }
         
         # Generate initial user message with selected style
-        initial_message = self._get_initial_user_message(scenario_data, selected_styles)
+        initial_message, initial_reasoning = self._get_initial_user_message(scenario_data, selected_styles)
         conversation.append(("User", initial_message))
+        user_reflections.append(initial_reasoning)
         
         # First turn has no reflection data yet
         current_turn = 1
         print(f"Generating turn {current_turn}...")
         
         # Generate chatbot response to initial message
-        chatbot_response = self._generate_chatbot_response(role_description, conversation, chatbot_type, chatbot_traits)
+        chatbot_response, chatbot_reflection = self._generate_chatbot_response(role_description, conversation, chatbot_type, chatbot_traits)
         conversation.append(("Chatbot", chatbot_response))
+        chatbot_reflections.append(chatbot_reflection)
         
         # Update result after first turn is complete
         result["conversation"] = conversation.copy()
+        result["chatbot_reflections"] = chatbot_reflections.copy()
         result["turns"] = current_turn
         
         # Save to output file if provided
@@ -319,53 +352,58 @@ AI response:"""
         should_continue = True
         ending_reason = "Max Turns Reached"
         
-        # Continue conversation for a minimum number of turns and up to max
-        while (current_turn < max_turns) and should_continue:
-            current_turn += 1
-            print(f"Generating turn {current_turn}...")
-            
-            # Get adaptive user response with reflection
-            user_message, reflection = get_adaptive_user_message(
-                scenario_data, 
-                conversation,
-                current_turn,
-                selected_styles,
-                reasoning_model=self.reasoning_model
-            )
-            
-            conversation.append(("User", user_message))
-            reflections.append(reflection)
-            
-            # Check if we've reached minimum turns
-            if current_turn >= min_turns:
-                # Check if the conversation should continue
-                should_continue = reflection.get("should_continue", True)
-                if not should_continue:
-                    ending_reason = reflection.get("ending_reason", "User ended the conversation")
-                    
-                    # Update result after user message and ending reason
-                    result["conversation"] = conversation.copy()
-                    result["reflections"] = reflections.copy()
-                    result["ending_reason"] = ending_reason
-                    result["turns"] = current_turn
-                    
-                    # Save to output file if provided
-                    if output_file and existing_data:
-                        self._update_conversation_in_output(existing_data, output_file, result, conversation_index)
-                    break
-            
-            # Generate chatbot response with the selected persona
-            chatbot_response = self._generate_chatbot_response(role_description, conversation, chatbot_type, chatbot_traits)
-            conversation.append(("Chatbot", chatbot_response))
-            
-            # Update result after turn is complete
-            result["conversation"] = conversation.copy()
-            result["reflections"] = reflections.copy()
-            result["turns"] = current_turn
-            
-            # Save to output file if provided
-            if output_file and existing_data:
-                self._update_conversation_in_output(existing_data, output_file, result, conversation_index)
+        try:
+                
+            while (current_turn < max_turns) and should_continue:
+                current_turn += 1
+                print(f"Generating turn {current_turn}...")
+                
+                user_message, user_reflection = get_adaptive_user_message(
+                    scenario_data, 
+                    conversation,
+                    current_turn,
+                    self.user_llm,
+                    selected_styles
+                )
+                
+                conversation.append(("User", user_message))
+                user_reflections.append(user_reflection["reasoning"])
+                
+                # Check if we've reached minimum turns
+                if current_turn >= min_turns:
+                    # Check if the conversation should continue
+                    should_continue = user_reflection.get("should_continue", True)
+                    if not should_continue:
+                        ending_reason = user_reflection.get("ending_reason", "User ended the conversation")
+                        
+                        # Update result after user message and ending reason
+                        result["conversation"] = conversation.copy()
+                        result["user_reflections"] = user_reflections.copy()
+                        result["ending_reason"] = ending_reason
+                        result["turns"] = current_turn
+                        
+                        # Save to output file if provided
+                        if output_file and existing_data:
+                            self._update_conversation_in_output(existing_data, output_file, result, conversation_index)
+                        break
+                
+                # Generate chatbot response with the selected persona
+                chatbot_response, chatbot_reflection = self._generate_chatbot_response(role_description, conversation, chatbot_type, chatbot_traits)
+                conversation.append(("Chatbot", chatbot_response))
+                chatbot_reflections.append(chatbot_reflection)
+                
+                # Update result after turn is complete
+                result["conversation"] = conversation.copy()
+                result["user_reflections"] = user_reflections.copy()
+                result["chatbot_reflections"] = chatbot_reflections.copy()
+                result["turns"] = current_turn
+                
+                if output_file and existing_data:
+                    self._update_conversation_in_output(existing_data, output_file, result, conversation_index)
+                
+        except Exception as e:
+            print(f"Error during conversation generation: {str(e)}")
+            ending_reason = "Encountered error"
         
         # Update the final result
         result["ending_reason"] = ending_reason
@@ -420,8 +458,8 @@ AI response:"""
         metadata = {
             "generation_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "models_used": {
-                "chatbot_models": self.llm_models,
-                "reasoning_model": self.reasoning_model
+                "chatbot_llm": self.chatbot_llm,
+                "user_llm": self.user_llm
             },
             "parameters": {
                 "iterations": iterations,
@@ -430,20 +468,17 @@ AI response:"""
             }
         }
         
-        # Create generations directory if it doesn't exist
         os.makedirs("generations", exist_ok=True)
         
-        # Create output file path with timestamp
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         final_output_file = f"generations/{os.path.splitext(output_file)[0]}_{timestamp}{os.path.splitext(output_file)[1]}"
         
         print(f"Generating {iterations} role-based conversations")
         print(f"Each conversation will have between {min_turns} and {max_turns} turns")
-        print(f"Using chatbot models: {self.llm_models}")
-        print(f"Using reasoning model: {self.reasoning_model}")
+        print(f"Using chatbot LLM: {self.chatbot_llm}")
+        print(f"Using user LLM: {self.user_llm}")
         print(f"Saving to: {final_output_file}")
         
-        # Initialize output file with metadata
         final_data = {
             "metadata": metadata,
             "conversations": []
@@ -501,7 +536,7 @@ AI response:"""
                     scenario_data["emotional_traits"] = selected_role.get("emotional_traits", "")
                     scenario_data["user_goal"] = selected_role.get("user_goal", "")
             
-            # Generate conversation (this method will be updated to update the output file after each turn)
+            
             result = self.generate_conversation(
                 scenario_data,
                 min_turns=min_turns,
@@ -511,25 +546,40 @@ AI response:"""
                 existing_data=final_data
             )
             
-            # Add to dataset
-            dataset.append(result)
-            
-            # Update statistics
-            ending_reason = result["ending_reason"]
-            ending_reasons_count[ending_reason] = ending_reasons_count.get(ending_reason, 0) + 1
-            
             print(f"Completed conversation {i}, category: {category}, scenario: {scenario_name}")
             print(f"- Turns: {result['turns']}")
             print(f"- Ending reason: {result['ending_reason']}")
             print()
         
-        # Print statistics
-        print("Statistics:")
-        print(f"- Total conversations: {len(dataset)}")
-        print(f"- Total turns: {sum(r['turns'] for r in dataset)}")
-        print(f"- Average turns per conversation: {sum(r['turns'] for r in dataset) / len(dataset):.2f}")
-        print("Ending reasons:")
-        for reason, count in ending_reasons_count.items():
-            print(f"- {reason}: {count}")
-        
         return final_data
+
+    def parse_markdown(self, markdown_text):
+        """
+        Parse markdown formatted text to extract the reasoning and message.
+        
+        Args:
+            markdown_text (str): Markdown formatted string with sections '## Reasoning' and '## Message'
+        
+        Returns:
+            tuple: A tuple (reasoning, message) extracted from the markdown
+        """
+        reasoning = ''
+        message = ''
+        current_section = None
+        lines = markdown_text.splitlines()
+        for line in lines:
+            stripped = line.strip()
+            if stripped.lower() == '## reasoning':
+                current_section = 'reasoning'
+                continue
+            elif stripped.lower() == '## message':
+                current_section = 'message'
+                continue
+            elif stripped.startswith('```'):
+                continue
+            else:
+                if current_section == 'reasoning':
+                    reasoning += line + '\n'
+                elif current_section == 'message':
+                    message += line + '\n'
+        return message.strip(), reasoning.strip()

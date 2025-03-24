@@ -94,7 +94,6 @@ def evaluate_satisfaction_with_llm(conversation_history, user_expectation, turn_
     if len(conversation_history) < 2:
         return 1.0, "Initial satisfaction is perfect"
     
-    # Get the most recent user message and chatbot response
     last_user_index = -2  # Second-to-last message (user)
     last_chatbot_index = -1  # Last message (chatbot)
     

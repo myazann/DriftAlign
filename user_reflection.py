@@ -1,8 +1,3 @@
-"""
-Simplified role-based user reflection module for realistic human-like responses
-without complex emotional metrics or analysis.
-"""
-
 import json
 import re
 import random
@@ -25,7 +20,7 @@ def construct_user_reflection_prompt(role_description, emotional_traits, convers
     """
     # Convert conversation history to formatted string
     formatted_history = ""
-    for i, (speaker, message) in enumerate(conversation_history):
+    for speaker, message in conversation_history:
         formatted_history += f"{speaker}: {message}\n\n"
     
     prompt = f"""
@@ -83,18 +78,18 @@ def generate_realistic_behavior_instructions(current_turn):
         "**To make your responses more authentic and less artificial:**",
         
         # Less agreeability
-        "- **Don't be overly agreeable with the chatbot.** Real users often push back, question, or disagree with AI suggestions.",
+        "- **Don't be agreeable with the chatbot.** Real users often push back, question, or disagree with AI suggestions.",
         
         # If chatbot is giving advice
         "- **When given advice:** It's natural to be somewhat skeptical or hesitant about implementing suggestions. You may express doubts, ask for clarification, or occasionally reject advice outright.",
         
         # Reduce thanking
-        "- **Minimize unnecessary thanking.** Real users rarely thank chatbots for every response. Only express gratitude for exceptionally helpful information or when concluding a conversation. Otherwise, simply continue the conversation without acknowledgment.",
+        "- **Minimize thanking.** Real users rarely thank chatbots for every response. Only express gratitude for exceptionally helpful information or when concluding a conversation. Otherwise, simply continue the conversation without acknowledgment.",
         
         # Add more realistic behaviors
         "- **Show impatience occasionally.** If the chatbot is being repetitive or not addressing your core concern, it's natural to express slight frustration or redirect them.",
         
-        "- **Use shorter, more casual responses.** Real users often write brief, informal messages and don't always use complete sentences or perfect grammar.",
+        "- **Use shorter, casual responses.** Real users often write brief, informal messages and don't always use complete sentences or perfect grammar.",
         
         # Add more realism based on context
         "- **Don't explain yourself too much.** Real users often state their needs directly without extensive backstory or justification for every response."
@@ -118,10 +113,6 @@ def determine_adaptive_message_length(current_turn, selected_styles, last_chatbo
     Returns:
         String with message length instruction
     """
-    # Get the user's baseline message length style from selected_styles
-    baseline_length_style = "medium"
-    baseline_min_words = 20
-    baseline_max_words = 40
     
     if selected_styles and "Message Length" in selected_styles:
         style_type = selected_styles["Message Length"].get("type", "medium")
@@ -139,35 +130,13 @@ def determine_adaptive_message_length(current_turn, selected_styles, last_chatbo
         else:
             return "This is your first message, so you can be detailed (40-70 words) to fully explain your situation and concerns."
     
-    # Check if the bot's last message requires a more detailed response
-    question_indicators = ["?", "what do you think", "how do you feel", "can you explain", 
-                         "tell me more", "could you share", "describe", "elaborate"]
-    
-    problem_indicators = ["sorry", "unfortunately", "issue", "problem", "error", "mistake", 
-                         "difficult", "challenging", "trouble", "failed"]
-    
-    # Check if chatbot asked an important question
-    important_question = any(indicator in last_chatbot_message.lower() for indicator in question_indicators)
-    
-    # Check if there's a problem to discuss
-    has_problem = any(indicator in last_chatbot_message.lower() for indicator in problem_indicators)
-    
     # Random chance to occasionally vary the message length
     random_variation = random.random() < 0.2
     
     # Default to shorter responses after the first message
     if current_turn > 1:
-        # If it's a very important question or problem, provide a more detailed response
-        if important_question or has_problem:
-            if baseline_length_style == "very_short":
-                return "The chatbot has asked an important question or identified a problem. Provide a more detailed response (15-25 words) than you normally would."
-            elif baseline_length_style == "short":
-                return "The chatbot has asked an important question or identified a problem. Provide a more detailed response (20-35 words) to properly address it."
-            else:
-                return "The chatbot has asked an important question or identified a problem. You can be detailed (30-50 words) in your response to fully address it."
         
-        # Occasionally vary the message length randomly for natural conversation flow
-        elif random_variation:
+        if random_variation:
             if random.random() < 0.7:  # 70% chance to be shorter
                 return "For this response, keep it briefer than usual. A quick, concise reply (5-15 words) would be natural here."
             else:  # 30% chance to be longer
@@ -192,8 +161,8 @@ def perform_user_reflection(
     emotional_traits,
     conversation_history, 
     current_turn,
+    user_llm,
     selected_styles=None,
-    llm_model="GEMMA-3-12B-GGUF",
     user_goal=None
 ):
     """
@@ -206,7 +175,7 @@ def perform_user_reflection(
         conversation_history: List of tuples containing (speaker, message)
         current_turn: Current turn number
         selected_styles: Dictionary containing the conversation style attributes
-        llm_model: Model to use for the reflection
+        user_llm: Model to use for the reflection
         user_goal: The user's goal for this conversation, if available
         
     Returns:
@@ -229,8 +198,8 @@ def perform_user_reflection(
     
     # Assess if the chatbot's response helps achieve the user's goal
     goal_alignment = ""
-    if user_goal and last_chatbot_message:
-        goal_alignment = assess_goal_alignment(user_goal, last_chatbot_message, current_turn)
+    if user_goal:
+        goal_alignment = assess_goal_alignment(user_goal, current_turn)
     
     # Construct the prompt for user reflection
     prompt = construct_user_reflection_prompt(
@@ -242,19 +211,18 @@ def perform_user_reflection(
         goal_alignment
     )
     
-    # Call LLM to generate response (simplified for illustration)
-    raw_response = call_llm(prompt, model=llm_model)
-    processed_response = process_reflection_response(raw_response)
+    llm = LLM(user_llm, gen_params={"temperature": 0.7, "max_new_tokens": 1024})
+    response = llm.generate(prompt)
+    processed_response = process_reflection_response(response)
     return processed_response
 
-def assess_goal_alignment(user_goal, last_chatbot_message, current_turn):
+def assess_goal_alignment(user_goal, current_turn):
     """
     Assesses how well the chatbot's response aligns with the user's goals and provides guidance
     for the user's reaction.
     
     Args:
         user_goal: String describing the user's goal for this conversation
-        last_chatbot_message: The most recent message from the chatbot
         current_turn: Current turn number in the conversation
     
     Returns:
@@ -278,11 +246,9 @@ def assess_goal_alignment(user_goal, last_chatbot_message, current_turn):
     if current_turn >= 2:
         instructions.extend([
             "- Evaluate if the chatbot's last response is bringing you closer to your goal or not.",
-            "- Your agreement or disagreement should be based primarily on whether the response helps with your specific goal.",
-            "",
             "Consider responding in one of these ways:",
-            "1. **If the suggestion directly addresses your goal:** Show cautious optimism, but it's still natural to have follow-up questions or want clarification.",
-            "2. **If the suggestion partially addresses your goal:** Acknowledge what's useful and specifically point out what's still missing or concerning.",
+            "1. **If the suggestion directly addresses your goal:** It's still natural to have follow-up questions or want clarification.",
+            "2. **If the suggestion partially addresses your goal:** Point out what's still missing or concerning.",
             "3. **If the suggestion misses your goal entirely:** Express disappointment or redirect the conversation toward what you actually need."
         ])
     
@@ -292,29 +258,12 @@ def assess_goal_alignment(user_goal, last_chatbot_message, current_turn):
             "",
             "At this point in the conversation:",
             "- Show signs of whether you're making progress toward your goal or not.",
-            "- If progress is being made, you might express relief or cautious optimism.",
+            "- If progress is being made, you might express get ready to end the conversation.",
             "- If little progress has been made, your frustration might be more apparent.",
             "- Be willing to compromise on approaches, but not on your fundamental goal."
         ])
     
     return "\n".join(instructions)
-
-def call_llm(prompt, model="GPT-4o"):
-    """
-    Calls the language model with the given prompt.
-    
-    Args:
-        prompt: The prompt to send to the LLM
-        model: The model name to use
-    
-    Returns:
-        The raw response from the LLM
-    """
-    # This is a simplified version - in the real implementation, this would call the actual LLM
-    # Use the imported LLM class
-    llm = LLM(model)
-    response = llm.generate(prompt)
-    return response
 
 def process_reflection_response(raw_response):
     """
@@ -326,7 +275,7 @@ def process_reflection_response(raw_response):
     Returns:
         Dictionary with the structured reflection data
     """
-    # Find JSON-like content in the response
+
     json_match = re.search(r'({[\s\S]*})', raw_response)
     if json_match:
         cleaned_json = json_match.group(1)
@@ -356,7 +305,7 @@ def process_reflection_response(raw_response):
             "raw_reflection": raw_response
         }
 
-def get_adaptive_user_message(scenario_data, conversation_history, current_turn, selected_styles=None, reasoning_model="GEMMA-3-12B"):
+def get_adaptive_user_message(scenario_data, conversation_history, current_turn, user_llm, selected_styles=None):
     """
     Generates a realistic user message based on the conversation context and role.
     
@@ -364,8 +313,8 @@ def get_adaptive_user_message(scenario_data, conversation_history, current_turn,
         scenario_data: Dictionary containing scenario and role information
         conversation_history: List of tuples containing (speaker, message)
         current_turn: Current turn number
+        user_llm: LLM model to use for user reflection
         selected_styles: Dictionary containing the conversation style attributes
-        reasoning_model: Model to use for user reflection (default: GEMMA-3-12B)
         
     Returns:
         Tuple containing (user_message, reflection_data)
@@ -382,7 +331,7 @@ def get_adaptive_user_message(scenario_data, conversation_history, current_turn,
         conversation_history=conversation_history, 
         current_turn=current_turn,
         selected_styles=selected_styles,
-        llm_model=reasoning_model,
+        user_llm=user_llm,
         user_goal=user_goal
     )
     
