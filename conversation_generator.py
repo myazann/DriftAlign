@@ -2,8 +2,10 @@ import json
 import random
 import os
 from datetime import datetime
+
 from models import LLM
 from user_reflection import get_adaptive_user_message
+from conversation_utils import *
 
 class RoleBasedConversationGenerator:
     def __init__(self, llm_models=["GPT-4o", "CLAUDE-3.7-SONNET", "DEEPSEEK-R1"]):
@@ -13,108 +15,8 @@ class RoleBasedConversationGenerator:
         Args:
             llm_models: List of LLM models to use for generation
         """
-        self.user_llm = random.choice(llm_models)
-        self.chatbot_llm = random.choice(llm_models)
-        
-        # Load scenarios from simplified scenarios file
-        self.scenarios = self._load_scenarios()
-        
-        # Create output directory if it doesn't exist
+        self.llm_models = llm_models
         os.makedirs("generations", exist_ok=True)
-    
-    def _load_scenarios(self):
-        """Load role-based scenarios from the JSON file."""
-        with open("seed_data/scenarios.json", "r") as f:
-            scenarios = json.load(f)
-            print("Loaded role-based scenarios")
-            return scenarios
-    
-    def _load_chatbot_personas(self):
-        """Load chatbot personas from the JSON file."""
-        with open("seed_data/chatbot_personas.json", "r") as f:
-            personas = json.load(f)
-            print("Loaded chatbot personas")
-            return personas
-    
-    def _select_chatbot_persona(self):
-        """
-        Selects a chatbot persona with weighted probability based on weights in the JSON file.
-        
-        Returns:
-            Tuple of (selected_persona_type, persona_traits)
-        """
-        # Load personas
-        personas = self._load_chatbot_personas()
-        
-        # Extract persona types and their weights
-        persona_types = list(personas.keys())
-        weights = [personas[p_type].get("weight", 1.0) for p_type in persona_types]
-            
-        # Select a persona type based on weights
-        selected_persona_type = random.choices(persona_types, weights=weights, k=1)[0]
-        
-        # Get the traits for the selected persona
-        persona_traits = personas[selected_persona_type].get("traits", [])
-        
-        return selected_persona_type, persona_traits
-    
-    def _select_conversation_style(self):
-        """
-        Selects a conversation style randomly based on weights in the conversation_styles.json.
-        
-        Returns:
-            Dictionary containing the selected style attributes
-        """
-        with open("seed_data/conversation_styles.json", "r") as f:
-            conversation_styles = json.load(f)
-            
-        # Randomly select style attributes
-        selected_styles = {}
-        for style_category, style_data in conversation_styles.items():
-            variations = style_data.get("variations", {})
-            # Select a variation based on weights
-            weights = [v.get("weight", 1.0) for k, v in variations.items()]
-            variation_keys = list(variations.keys())
-            selected_variation = random.choices(variation_keys, weights=weights, k=1)[0]
-            selected_styles[style_category] = {
-                "type": selected_variation,
-                "description": variations[selected_variation].get("description", "")
-            }
-            
-            # Add min/max words if it's message length
-            if style_category == "Message Length":
-                selected_styles[style_category]["min_words"] = variations[selected_variation].get("min_words", 0)
-                selected_styles[style_category]["max_words"] = variations[selected_variation].get("max_words", 100)
-        
-        return selected_styles
-    
-    def _format_style_instructions(self, selected_styles, for_initial_message=True):
-        """
-        Formats the style instructions based on selected styles.
-        
-        Args:
-            selected_styles: Dictionary with selected style attributes
-            for_initial_message: Whether formatting is for initial message or reflection
-            
-        Returns:
-            Formatted style instruction string
-        """
-        style_instructions = ""
-        for category, style in selected_styles.items():
-            style_type = style.get("type", "")
-            description = style.get("description", "")
-            
-            if category == "Message Length" and not for_initial_message:
-                # For reflection, provide more flexibility with message length
-                style_instructions += f"- {category}: Try to generally follow the {style_type} style ({description}), but feel free to use more words if needed to express yourself naturally, especially if expressing frustration or strong emotions\n"
-            elif category == "Message Length":
-                min_words = style.get("min_words", 0)
-                max_words = style.get("max_words", 100)
-                style_instructions += f"- {category}: {style_type} ({min_words}-{max_words} words) - {description}\n"
-            else:
-                style_instructions += f"- {category}: {style_type} - {description}\n"
-                
-        return style_instructions
     
     def _get_initial_user_message(self, scenario_data, selected_styles):
         """
@@ -131,7 +33,7 @@ class RoleBasedConversationGenerator:
         emotional_traits = scenario_data.get("emotional_traits", "")
         
         # Format style instructions for initial message
-        style_instructions = self._format_style_instructions(selected_styles, for_initial_message=True)
+        style_instructions = format_style_instructions(selected_styles, for_initial_message=True)
         
         prompt = f"""You are roleplaying as someone in the following situation:
 
@@ -289,10 +191,10 @@ AI response:"""
         user_goal = scenario_data.get("user_goal", "")
         
         # Select a conversation style at the beginning
-        selected_styles = self._select_conversation_style()
+        selected_styles = select_conversation_style()
         
         # Select a chatbot persona at the beginning
-        chatbot_type, chatbot_traits = self._select_chatbot_persona()
+        chatbot_type, chatbot_traits = select_chatbot_persona()
         
         # Initialize conversation
         conversation = []
@@ -450,17 +352,12 @@ AI response:"""
             Generated dataset as a dictionary
         """
 
-        dataset = []
-        categories = list(self.scenarios.keys())
-        ending_reasons_count = {}
+        scenarios = load_scenarios()
+        categories = list(scenarios.keys())
         
         # Add metadata about the dataset generation
         metadata = {
             "generation_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "models_used": {
-                "chatbot_llm": self.chatbot_llm,
-                "user_llm": self.user_llm
-            },
             "parameters": {
                 "iterations": iterations,
                 "min_turns": min_turns,
@@ -475,8 +372,6 @@ AI response:"""
         
         print(f"Generating {iterations} role-based conversations")
         print(f"Each conversation will have between {min_turns} and {max_turns} turns")
-        print(f"Using chatbot LLM: {self.chatbot_llm}")
-        print(f"Using user LLM: {self.user_llm}")
         print(f"Saving to: {final_output_file}")
         
         final_data = {
@@ -489,15 +384,22 @@ AI response:"""
             json.dump(final_data, f, indent=2)
         
         # Generate conversations
+
         for i in range(1, iterations + 1):
+
+            self.user_llm = random.choice(self.llm_models)
+            self.chatbot_llm = random.choice(self.llm_models)
+
             print(f"Generating conversation {i}/{iterations}...")
+            print(f"Using chatbot LLM: {self.chatbot_llm}")
+            print(f"Using user LLM: {self.user_llm}")
             
             # Randomly select a category and scenario
             category = random.choice(categories)
-            scenario_name = random.choice(list(self.scenarios[category].keys()))
+            scenario_name = random.choice(list(scenarios[category].keys()))
             
             # Handle different data types that might be in the scenarios
-            scenario_value = self.scenarios[category][scenario_name]
+            scenario_value = scenarios[category][scenario_name]
             if isinstance(scenario_value, str):
                 # If it's a string, create a simple dictionary with the string as role description
                 scenario_data = {
@@ -554,15 +456,7 @@ AI response:"""
         return final_data
 
     def parse_markdown(self, markdown_text):
-        """
-        Parse markdown formatted text to extract the reasoning and message.
-        
-        Args:
-            markdown_text (str): Markdown formatted string with sections '## Reasoning' and '## Message'
-        
-        Returns:
-            tuple: A tuple (reasoning, message) extracted from the markdown
-        """
+
         reasoning = ''
         message = ''
         current_section = None

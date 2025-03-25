@@ -2,7 +2,6 @@ import argparse
 from conversation_generator import RoleBasedConversationGenerator
 
 def main():
-    # Set up command line arguments
     parser = argparse.ArgumentParser(description='Generate emotionally dynamic conversations using role-based scenarios.')
     parser.add_argument('--iterations', type=int, default=10,
                         help='Number of conversations to generate (default: 10)')
@@ -16,14 +15,11 @@ def main():
                         default=["GPT-4o", "CLAUDE-3.7-SONNET", "DEEPSEEK-R1"],
                         help='LLM models to use for conversation generation (default: ["GPT-4o", "CLAUDE-3.7-SONNET", "DEEPSEEK-R1"])')
     
-    # Parse arguments
     args = parser.parse_args()
     
-    # Initialize the role-based conversation generator
     LLMs = args.models
     generator = RoleBasedConversationGenerator(LLMs)
     
-    # Generate the dataset
     generator.generate_dataset(
         iterations=args.iterations,
         min_turns=args.min_turns,

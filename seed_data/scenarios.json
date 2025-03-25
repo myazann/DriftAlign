@@ -223,6 +223,26 @@
           "user_goal": "To make a decision about the job offer that considers both your career advancement and your family's wellbeing. You'll be satisfied when you have a framework for making this decision that accounts for all family members' needs and a concrete plan for minimizing disruption if you move."
         }
       ]
+    },
+    "Work Productivity": {
+      "topic": "Improving efficiency and effectiveness at work",
+      "roles": [
+        {
+          "role_description": "You've recently been promoted to team leader and are struggling to balance your own work tasks with new management responsibilities. You feel constantly behind and are working long hours to compensate. You need to find a better system for prioritization and delegation.",
+          "emotional_traits": "Conscientious about performance, reluctant to burden team members, values thoroughness, anxious about being judged as incompetent",
+          "user_goal": "To develop effective time management and delegation strategies for your new leadership role. You'll feel satisfied when you have a clear framework for prioritizing tasks, specific techniques for delegating appropriately, and a sustainable work schedule that doesn't require constant overtime."
+        },
+        {
+          "role_description": "You work in a busy open office environment and find it increasingly difficult to focus on deep work with constant interruptions. You can't change your physical workspace, and you have collaborative responsibilities that prevent you from being completely unavailable. You need strategies to protect your focus while remaining accessible.",
+          "emotional_traits": "Frustrated by productivity barriers, concerned about seeming unfriendly, values quality work, experiences mental fatigue from context-switching",
+          "user_goal": "To create a system for managing interruptions while maintaining focus in your open office. You'll feel satisfied when you have practical techniques for signaling availability, scheduling focused work time, and efficiently handling necessary interruptions."
+        },
+        {
+          "role_description": "You're overwhelmed by email and digital communications across multiple platforms at work. Important information gets lost, you miss deadlines because requests are buried, and you spend hours each day just trying to stay on top of messages. You need a more efficient system for information management.",
+          "emotional_traits": "Anxious about missing critical information, overwhelmed by volume, perfectionistic about responsiveness, frustrated by time wasted",
+          "user_goal": "To establish an effective system for managing your digital communications at work. You'll feel satisfied when you have a reliable method for prioritizing messages, standard practices for different communication channels, and strategies for reducing overall communication volume."
+        }
+      ]
     }
   },
   "Day-to-Day Technical": {
@@ -367,121 +387,66 @@
           "user_goal": "To rediscover joy and inspiration in your painting practice. You'll feel satisfied when you have novel approaches to try, techniques for overcoming self-criticism, and a renewed sense of purpose in your creative hobby."
         }
       ]
+    },
+    "Writing Assistance": {
+      "topic": "Getting help with writing tasks",
+      "roles": [
+        {
+          "role_description": "You're working on an important email to your entire organization about upcoming changes. You want it to sound professional but empathetic, as some of the changes may be difficult for employees. You're struggling with the tone and clarity of your message.",
+          "emotional_traits": "Concerned about how message will be received, detail-oriented, values clear communication, anxious about potential misinterpretations",
+          "user_goal": "To draft a clear, professional email that effectively communicates organizational changes while showing empathy for employees. You'll feel satisfied when you have a well-structured message that balances directness about the changes with sensitivity to how they'll affect staff."
+        },
+        {
+          "role_description": "You're writing your first resume after graduating from college and feel overwhelmed by conflicting advice online. You have limited work experience but several relevant academic projects and volunteer positions. You're unsure how to present yourself effectively to potential employers.",
+          "emotional_traits": "Uncertain about own qualifications, perfectionist tendencies, compares self to peers, eager to make good impression",
+          "user_goal": "To create a resume that effectively showcases your strengths despite limited work experience. You'll feel satisfied when you have a professional resume structure with clear guidance on how to highlight academic projects and volunteer work in a way that appeals to employers."
+        },
+        {
+          "role_description": "You're trying to write a best man speech for your brother's wedding next month. You want it to be funny but appropriate, personal but not embarrassing, and meaningful without being overly sentimental. You've started several drafts but aren't happy with any of them.",
+          "emotional_traits": "Wants to honor important relationship, anxious about public speaking, uses humor to deflect emotions, concerned about audience reception",
+          "user_goal": "To craft a memorable best man speech that strikes the right balance of humor, sincerity, and appropriateness. You'll feel satisfied when you have a well-structured speech with personal anecdotes that reflect your relationship with your brother without crossing into inappropriate territory."
+        }
+      ]
+    },
+    "Idea Discussion": {
+      "topic": "Exploring and refining ideas",
+      "roles": [
+        {
+          "role_description": "You're a teacher planning a new interdisciplinary project for your middle school students. You want to combine elements of science, history, and art, but are struggling to find a unifying theme that will engage students and satisfy curriculum requirements.",
+          "emotional_traits": "Enthusiastic about innovative teaching, practical about implementation challenges, values student engagement, wants tangible outcomes",
+          "user_goal": "To develop a cohesive interdisciplinary project plan that excites students while meeting curriculum standards. You'll feel satisfied when you have a clear project theme, specific activities for each subject area, and assessment criteria that measure learning across disciplines."
+        },
+        {
+          "role_description": "You're brainstorming business ideas for a side hustle that could eventually become your full-time job. You have skills in graphic design and social media management but aren't sure what specific service or product would be viable in your local market.",
+          "emotional_traits": "Dreams of entrepreneurship, cautious about financial risk, compares ideas to existing businesses, seeks validation of concepts",
+          "user_goal": "To identify a viable business concept that leverages your skills and has potential in your market. You'll feel satisfied when you have narrowed down to 1-2 specific business ideas with clear service offerings, target customer profiles, and initial steps for market testing."
+        },
+        {
+          "role_description": "You're planning a significant home renovation project but have a limited budget. You need to prioritize which improvements will add the most value to your home while also enhancing your quality of life. You have many ideas but aren't sure which are most practical.",
+          "emotional_traits": "Excited about transformation possibilities, concerned about costs, values both aesthetics and functionality, wants to avoid regrets",
+          "user_goal": "To create a prioritized renovation plan that maximizes value within your budget constraints. You'll feel satisfied when you have a clear list of improvements ranked by importance, cost estimates for each, and a phased approach to completing the work over time."
+        }
+      ]
+    },
+    "Daily Life Questions": {
+      "topic": "Advice for everyday situations and decisions",
+      "roles": [
+        {
+          "role_description": "You've recently moved to a new city and are having trouble establishing a social circle. You're naturally introverted and work remotely, which limits your natural opportunities to meet people. You're looking for strategies to build meaningful connections in your new location.",
+          "emotional_traits": "Lonely but anxious about putting yourself out there, selective about friendships, values deeper connections over many acquaintances, fatigued by forced socializing",
+          "user_goal": "To develop practical strategies for building a social network as an introvert in a new city. You'll feel satisfied when you have specific approaches for meeting people that align with your personality, interests, and energy levels."
+        },
+        {
+          "role_description": "You're trying to establish a regular exercise routine after years of being sedentary. Previous attempts at getting fit have failed because you quickly lose motivation or get discouraged. You're looking for an approach that will be sustainable given your busy schedule and low initial fitness level.",
+          "emotional_traits": "Embarrassed about current fitness, easily discouraged by slow progress, compares self to others, fluctuates between high motivation and complete avoidance",
+          "user_goal": "To create a sustainable exercise plan that accommodates your current fitness level and schedule. You'll feel satisfied when you have a realistic routine with specific activities, measurable progress markers, and strategies to maintain motivation during difficult periods."
+        },
+        {
+          "role_description": "You're planning meals for the upcoming week and want to incorporate more plant-based options for health and environmental reasons. However, you have picky eaters in your household and limited cooking experience with vegetarian cuisine. You need practical ideas that will satisfy everyone.",
+          "emotional_traits": "Determined to make positive changes, frustrated by family resistance, practical about time constraints, values compromise over perfection",
+          "user_goal": "To develop a meal plan that increases plant-based options while still appealing to your family. You'll feel satisfied when you have specific recipes to try, shopping lists for ingredients, and strategies for introducing new foods in a way that minimizes resistance."
+        }
+      ]
     }
-  },
-  "Housing Decision": {
-    "topic": "Making decisions about housing and real estate",
-    "roles": [
-      {
-        "role_description": "You want to buy your first home but are uncertain if now is the right time. Housing prices in your area are high, and you're concerned about interest rates and potential economic instability. You have a stable job and have saved enough for a down payment, but it would deplete most of your savings.",
-        "emotional_traits": "Excited but risk-aware, expresses FOMO (fear of missing out) about rising prices, seeks mathematical validation, imagines both positive and negative future scenarios",
-        "user_goal": "To determine if you should proceed with buying a home now or continue renting and saving. You'll feel satisfied when you have a clear financial analysis of both options and specific markers that would indicate when the time is right to buy."
-      },
-      {
-        "role_description": "You're considering moving from a high-cost urban area to a more affordable suburban or rural location. While you'd save significantly on housing costs, you're concerned about potential lifestyle changes, community fit, and career opportunities. The pandemic has made remote work more feasible but not guaranteed long-term.",
-        "emotional_traits": "Romanticizes aspects of both urban and rural life, quantifies financial benefits precisely, seeks social validation for major life changes, shows anxiety about 'making the wrong choice'",
-        "user_goal": "To decide whether relocating from the city would improve your overall quality of life. You'll feel satisfied when you have a framework for evaluating both tangible factors (housing costs, commute) and intangible factors (community, lifestyle) to make a confident decision."
-      }
-    ]
-  },
-  "Financial Planning": {
-    "topic": "Making financial planning decisions",
-    "roles": [
-      {
-        "role_description": "You recently inherited a significant sum of money from a relative and are unsure how to manage it wisely. You have some debt, no investment experience, and are concerned about making poor decisions. You're considering various options including paying off debt, investing, buying property, or simply keeping it in savings.",
-        "emotional_traits": "Careful with financial decisions, expresses both opportunity and anxiety, occasionally mentions relative who left the money, seeks educational approach",
-        "user_goal": "To develop a comprehensive plan for your inheritance that balances immediate needs with long-term financial security. You'll feel satisfied when you have a prioritized action plan and knowledge about different investment options suitable for your risk tolerance."
-      },
-      {
-        "role_description": "You've accumulated significant credit card debt across multiple cards and are finding it increasingly difficult to make minimum payments. You have a steady income but between rent, car payments, and other expenses, you're barely staying afloat. You're feeling overwhelmed and unsure how to address the growing debt.",
-        "emotional_traits": "Shows shame around financial situation, avoids detailed numbers initially, expresses determination to improve, becomes more open with encouragement",
-        "user_goal": "To create a realistic debt repayment plan that fits within your current income constraints. You'll feel satisfied when you have specific strategies for reducing interest rates, prioritizing which debts to pay first, and a monthly budget that allows for gradual debt reduction."
-      },
-      {
-        "role_description": "You're a new parent planning for your child's future education. You want to start saving early but are confused by the various college savings plans, investment options, and projections about future education costs. You're trying to balance education savings with other financial priorities like retirement.",
-        "emotional_traits": "Forward-thinking, methodical in approach, expresses desire to maximize opportunities for child, seeks to understand complex options simply",
-        "user_goal": "To establish an effective college savings plan for your child while maintaining your own financial stability. You'll feel satisfied when you understand the differences between savings options, have a target monthly contribution amount, and know how to balance education savings with other financial goals."
-      }
-    ]
-  },
-  "Writing Assistance": {
-    "topic": "Getting help with writing tasks",
-    "roles": [
-      {
-        "role_description": "You're working on an important email to your entire organization about upcoming changes. You want it to sound professional but empathetic, as some of the changes may be difficult for employees. You're struggling with the tone and clarity of your message.",
-        "emotional_traits": "Concerned about how message will be received, detail-oriented, values clear communication, anxious about potential misinterpretations",
-        "user_goal": "To draft a clear, professional email that effectively communicates organizational changes while showing empathy for employees. You'll feel satisfied when you have a well-structured message that balances directness about the changes with sensitivity to how they'll affect staff."
-      },
-      {
-        "role_description": "You're writing your first resume after graduating from college and feel overwhelmed by conflicting advice online. You have limited work experience but several relevant academic projects and volunteer positions. You're unsure how to present yourself effectively to potential employers.",
-        "emotional_traits": "Uncertain about own qualifications, perfectionist tendencies, compares self to peers, eager to make good impression",
-        "user_goal": "To create a resume that effectively showcases your strengths despite limited work experience. You'll feel satisfied when you have a professional resume structure with clear guidance on how to highlight academic projects and volunteer work in a way that appeals to employers."
-      },
-      {
-        "role_description": "You're trying to write a best man speech for your brother's wedding next month. You want it to be funny but appropriate, personal but not embarrassing, and meaningful without being overly sentimental. You've started several drafts but aren't happy with any of them.",
-        "emotional_traits": "Wants to honor important relationship, anxious about public speaking, uses humor to deflect emotions, concerned about audience reception",
-        "user_goal": "To craft a memorable best man speech that strikes the right balance of humor, sincerity, and appropriateness. You'll feel satisfied when you have a well-structured speech with personal anecdotes that reflect your relationship with your brother without crossing into inappropriate territory."
-      }
-    ]
-  },
-  "Idea Discussion": {
-    "topic": "Exploring and refining ideas",
-    "roles": [
-      {
-        "role_description": "You're a teacher planning a new interdisciplinary project for your middle school students. You want to combine elements of science, history, and art, but are struggling to find a unifying theme that will engage students and satisfy curriculum requirements.",
-        "emotional_traits": "Enthusiastic about innovative teaching, practical about implementation challenges, values student engagement, wants tangible outcomes",
-        "user_goal": "To develop a cohesive interdisciplinary project plan that excites students while meeting curriculum standards. You'll feel satisfied when you have a clear project theme, specific activities for each subject area, and assessment criteria that measure learning across disciplines."
-      },
-      {
-        "role_description": "You're brainstorming business ideas for a side hustle that could eventually become your full-time job. You have skills in graphic design and social media management but aren't sure what specific service or product would be viable in your local market.",
-        "emotional_traits": "Dreams of entrepreneurship, cautious about financial risk, compares ideas to existing businesses, seeks validation of concepts",
-        "user_goal": "To identify a viable business concept that leverages your skills and has potential in your market. You'll feel satisfied when you have narrowed down to 1-2 specific business ideas with clear service offerings, target customer profiles, and initial steps for market testing."
-      },
-      {
-        "role_description": "You're planning a significant home renovation project but have a limited budget. You need to prioritize which improvements will add the most value to your home while also enhancing your quality of life. You have many ideas but aren't sure which are most practical.",
-        "emotional_traits": "Excited about transformation possibilities, concerned about costs, values both aesthetics and functionality, wants to avoid regrets",
-        "user_goal": "To create a prioritized renovation plan that maximizes value within your budget constraints. You'll feel satisfied when you have a clear list of improvements ranked by importance, cost estimates for each, and a phased approach to completing the work over time."
-      }
-    ]
-  },
-  "Daily Life Questions": {
-    "topic": "Advice for everyday situations and decisions",
-    "roles": [
-      {
-        "role_description": "You've recently moved to a new city and are having trouble establishing a social circle. You're naturally introverted and work remotely, which limits your natural opportunities to meet people. You're looking for strategies to build meaningful connections in your new location.",
-        "emotional_traits": "Lonely but anxious about putting yourself out there, selective about friendships, values deeper connections over many acquaintances, fatigued by forced socializing",
-        "user_goal": "To develop practical strategies for building a social network as an introvert in a new city. You'll feel satisfied when you have specific approaches for meeting people that align with your personality, interests, and energy levels."
-      },
-      {
-        "role_description": "You're trying to establish a regular exercise routine after years of being sedentary. Previous attempts at getting fit have failed because you quickly lose motivation or get discouraged. You're looking for an approach that will be sustainable given your busy schedule and low initial fitness level.",
-        "emotional_traits": "Embarrassed about current fitness, easily discouraged by slow progress, compares self to others, fluctuates between high motivation and complete avoidance",
-        "user_goal": "To create a sustainable exercise plan that accommodates your current fitness level and schedule. You'll feel satisfied when you have a realistic routine with specific activities, measurable progress markers, and strategies to maintain motivation during difficult periods."
-      },
-      {
-        "role_description": "You're planning meals for the upcoming week and want to incorporate more plant-based options for health and environmental reasons. However, you have picky eaters in your household and limited cooking experience with vegetarian cuisine. You need practical ideas that will satisfy everyone.",
-        "emotional_traits": "Determined to make positive changes, frustrated by family resistance, practical about time constraints, values compromise over perfection",
-        "user_goal": "To develop a meal plan that increases plant-based options while still appealing to your family. You'll feel satisfied when you have specific recipes to try, shopping lists for ingredients, and strategies for introducing new foods in a way that minimizes resistance."
-      }
-    ]
-  },
-  "Work Productivity": {
-    "topic": "Improving efficiency and effectiveness at work",
-    "roles": [
-      {
-        "role_description": "You've recently been promoted to team leader and are struggling to balance your own work tasks with new management responsibilities. You feel constantly behind and are working long hours to compensate. You need to find a better system for prioritization and delegation.",
-        "emotional_traits": "Conscientious about performance, reluctant to burden team members, values thoroughness, anxious about being judged as incompetent",
-        "user_goal": "To develop effective time management and delegation strategies for your new leadership role. You'll feel satisfied when you have a clear framework for prioritizing tasks, specific techniques for delegating appropriately, and a sustainable work schedule that doesn't require constant overtime."
-      },
-      {
-        "role_description": "You work in a busy open office environment and find it increasingly difficult to focus on deep work with constant interruptions. You can't change your physical workspace, and you have collaborative responsibilities that prevent you from being completely unavailable. You need strategies to protect your focus while remaining accessible.",
-        "emotional_traits": "Frustrated by productivity barriers, concerned about seeming unfriendly, values quality work, experiences mental fatigue from context-switching",
-        "user_goal": "To create a system for managing interruptions while maintaining focus in your open office. You'll feel satisfied when you have practical techniques for signaling availability, scheduling focused work time, and efficiently handling necessary interruptions."
-      },
-      {
-        "role_description": "You're overwhelmed by email and digital communications across multiple platforms at work. Important information gets lost, you miss deadlines because requests are buried, and you spend hours each day just trying to stay on top of messages. You need a more efficient system for information management.",
-        "emotional_traits": "Anxious about missing critical information, overwhelmed by volume, perfectionistic about responsiveness, frustrated by time wasted",
-        "user_goal": "To establish an effective system for managing your digital communications at work. You'll feel satisfied when you have a reliable method for prioritizing messages, standard practices for different communication channels, and strategies for reducing overall communication volume."
-      }
-    ]
   }
 }

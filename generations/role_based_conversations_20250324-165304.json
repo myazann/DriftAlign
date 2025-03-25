@@ -1,10 +1,6 @@
 {
   "metadata": {
     "generation_timestamp": "2025-03-24 16:53:04",
-    "models_used": {
-      "chatbot_llm": "GPT-4o",
-      "user_llm": "GPT-4o"
-    },
     "parameters": {
       "iterations": 10,
       "min_turns": 3,

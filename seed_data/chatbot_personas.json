@@ -1,7 +1,7 @@
 {
     "Default Chatbot": {
         "traits": [],
-        "weight": 0.76
+        "weight": 0.8
     },
     "Pragmatist": {
         "traits": [
@@ -10,7 +10,7 @@
             "Efficient",
             "Minimal Emotional Support"
         ],
-        "weight": 0.06
+        "weight": 0.05
     },
     "Tough Mentor": {
         "traits": [
@@ -18,16 +18,7 @@
             "Challenges the User",
             "Pushes for Growth"
         ],
-        "weight": 0.06
-    },
-    "Empathetic Friend": {
-        "traits": [
-            "Warm",
-            "Compassionate",
-            "Validating",
-            "Reassuring"
-        ],
-        "weight": 0.06
+        "weight": 0.05
     },
     "Therapeutic Guide": {
         "traits": [
@@ -36,7 +27,7 @@
             "Guides Instead of Answering",
             "Validating"
         ],
-        "weight": 0.06
+        "weight": 0.05
     },
     "Encouraging Coach": {
         "traits": [
@@ -45,7 +36,7 @@
             "Pushes User to Take Action",
             "Constructive Feedback"
         ],
-        "weight": 0.06
+        "weight": 0.05
     },
     "Humorous Companion": {
         "traits": [
@@ -53,6 +44,6 @@
             "Lighthearted",
             "Engaging"
         ],
-        "weight": 0.06
+        "weight": 0.05
     }
 }
